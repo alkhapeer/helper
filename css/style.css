@@ -75,19 +75,65 @@ body { background:#f4f7fc; display:flex; justify-content:center; min-height:100v
 .plan-day .status.pending { color:#ff9500; }
 
 /* المودال */
-.modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; z-index:1000; padding:20px; }
-.modal-overlay.active { display:flex; }
-.modal-box { background:white; max-width:400px; width:100%; border-radius:28px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
-.modal-box h2 { font-size:22px; margin-bottom:8px; color:#1a2b4a; text-align:center; }
-.modal-box p { text-align:center; color:#3a4b6a; margin-bottom:16px; }
-.modal-box label { display:block; font-weight:600; margin-top:12px; margin-bottom:4px; font-size:14px; }
-.modal-box input, .modal-box select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid #e9edf4; font-size:16px; outline:none; }
-.modal-box input:focus, .modal-box select:focus { border-color:#5b7cfa; }
-.stage-options { display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
-.stage-options button { flex:1; padding:10px; border-radius:12px; border:2px solid #e9edf4; background:white; font-weight:600; font-size:16px; cursor:pointer; transition:0.2s; min-width:70px; }
-.stage-options button.active { border-color:#5b7cfa; background:#e0e8ff; }
-.btn-start-app { width:100%; padding:12px; margin-top:16px; font-size:18px; justify-content:center; }
-.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; flex-wrap:wrap; }
+/* مودال أكبر وأجمل */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-box {
+  background: white;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  height: auto;
+  border-radius: 32px;
+  padding: 32px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  animation: modalFadeIn 0.3s ease;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* تنسيق المحتوى الداخلي للدرس */
+.lesson-content {
+  line-height: 1.9;
+  font-size: 16px;
+  color: #1a2b4a;
+}
+.lesson-content h1 { font-size: 26px; margin: 20px 0 12px; color: #1a2b4a; }
+.lesson-content h2 { font-size: 22px; margin: 18px 0 10px; color: #2c3e6a; }
+.lesson-content h3 { font-size: 18px; margin: 14px 0 8px; color: #3a4b6a; }
+.lesson-content p { margin: 10px 0; }
+.lesson-content ul, .lesson-content ol { margin: 10px 0 10px 20px; }
+.lesson-content li { margin: 4px 0; }
+.lesson-content img { max-width: 100%; border-radius: 16px; margin: 12px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.lesson-content iframe { width: 100%; aspect-ratio: 16/9; border-radius: 16px; margin: 12px 0; border: none; }
+.lesson-content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.lesson-content th, .lesson-content td { border: 1px solid #e9edf4; padding: 8px 12px; text-align: right; }
+.lesson-content th { background: #f0f4fe; font-weight: 600; }
+.lesson-content .highlight-box { background: #f8faff; padding: 16px; border-radius: 16px; border-right: 4px solid #5b7cfa; margin: 12px 0; }
+.lesson-content .btn-outline { background: transparent; border: 1px solid #5b7cfa; color: #5b7cfa; padding: 6px 16px; border-radius: 30px; text-decoration: none; font-weight: 600; }
+.lesson-content .btn-outline:hover { background: #5b7cfa; color: white; }
+.lesson-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f4f8; }
+.lesson-header h2 { font-size: 26px; color: #1a2b4a; margin: 0; }
+.lesson-header .meta { font-size: 14px; color: #8a9bb5; }
+.lesson-header .meta i { margin-left: 4px; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f4f8; }
 .result-box { background:#e0f2e0; padding:16px; border-radius:16px; text-align:center; margin-top:10px; }
 .result-box .score-big { font-size:32px; font-weight:700; color:#1a2b4a; }
 .option { display:block; padding:8px 12px; margin:4px 0; background:white; border-radius:10px; border:1px solid #e9edf4; cursor:pointer; transition:0.2s; }
