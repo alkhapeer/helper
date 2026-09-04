@@ -1,69 +1,57 @@
-// المتغيرات العالمية (تُملأ من ملفات JSON)
-let SUBJECTS = [];
-let LESSONS = [];
-let TESTS = [];
+// هذه الدوال تعتمد على المتغيرات العامة (SUBJECTS, LESSONS, TESTS)
+// سيتم تعيينها في app.js بعد تحميل البيانات
 
-// تحميل البيانات من JSON
-function loadData(callback) {
-  // بما أننا نستخدم script src، البيانات موجودة في المتغيرات
-  // نستخدمها مباشرة
-  callback();
-}
-
-// دوال التصفية حسب المرحلة
 function getSubjectsForStage(stage) {
-  if (!stage) return SUBJECTS;
-  return SUBJECTS.filter(s => s.stage === stage);
+  if (!stage) return SUBJECTS || [];
+  return (SUBJECTS || []).filter(s => s.stage === stage);
 }
 
 function getLessonsForStage(stage) {
-  if (!stage) return LESSONS;
-  return LESSONS.filter(l => l.stage === stage);
+  if (!stage) return LESSONS || [];
+  return (LESSONS || []).filter(l => l.stage === stage);
 }
 
 function getTestsForStage(stage) {
-  if (!stage) return TESTS;
-  return TESTS.filter(t => t.stage === stage);
+  if (!stage) return TESTS || [];
+  return (TESTS || []).filter(t => t.stage === stage);
 }
 
 function getLessonsForSubject(subjectId) {
-  return LESSONS.filter(l => l.subjectId === subjectId);
+  return (LESSONS || []).filter(l => l.subjectId === subjectId);
 }
 
 function getTestsForSubject(subjectId) {
-  return TESTS.filter(t => t.subjectId === subjectId);
+  return (TESTS || []).filter(t => t.subjectId === subjectId);
 }
 
 function getSubjectsByCategory(stage, category) {
-  return SUBJECTS.filter(s => s.stage === stage && s.category === category);
+  return (SUBJECTS || []).filter(s => s.stage === stage && s.category === category);
 }
 
 function getCategoriesForStage(stage) {
   const categories = new Set();
-  SUBJECTS.filter(s => s.stage === stage).forEach(s => {
+  (SUBJECTS || []).filter(s => s.stage === stage).forEach(s => {
     if (s.category) categories.add(s.category);
   });
   return Array.from(categories);
 }
 
-// حساب التقدم
 function getOverallProgress(user) {
   const stageLessons = getLessonsForStage(user.stage);
   const total = stageLessons.length;
-  const completed = user.completedLessons.filter(id => 
+  const completed = user.completedLessons.filter(id =>
     stageLessons.some(l => l.id === id)
   ).length;
   return total > 0 ? Math.round((completed / total) * 100) : 0;
 }
 
-// نقاط القوة والضعف
 function getWeakTopics(user) {
   const map = {};
   const stageTests = getTestsForStage(user.stage);
   user.testResults.forEach(tr => {
     const test = stageTests.find(t => t.id === tr.testId);
     if (!test) return;
-    const subject = SUBJECTS.find(s => s.id === test.subjectId);
+    const subject = (SUBJECTS || []).find(s => s.id === test.subjectId);
     if (!subject) return;
     if (!map[subject.name]) map[subject.name] = [];
     map[subject.name].push(tr.score);
@@ -83,7 +71,7 @@ function getStrengths(user) {
   user.testResults.forEach(tr => {
     const test = stageTests.find(t => t.id === tr.testId);
     if (!test) return;
-    const subject = SUBJECTS.find(s => s.id === test.subjectId);
+    const subject = (SUBJECTS || []).find(s => s.id === test.subjectId);
     if (!subject) return;
     if (!map[subject.name]) map[subject.name] = [];
     map[subject.name].push(tr.score);
@@ -97,14 +85,12 @@ function getStrengths(user) {
   return strong;
 }
 
-// توليد الخطة الأسبوعية
 function generatePlan(user) {
   const days = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
   const weak = getWeakTopics(user);
   const stageLessons = getLessonsForStage(user.stage);
   const notCompleted = stageLessons.filter(l => !user.completedLessons.includes(l.id));
   const plan = [];
-  
   for (let i = 0; i < 7; i++) {
     let task = 'مراجعة عامة';
     if (weak.length > 0 && i < weak.length) {
