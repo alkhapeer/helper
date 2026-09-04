@@ -1,0 +1,14 @@
+[
+    { "id": "math1", "subjectId": "math", "title": "الأعداد من 1 إلى 100", "difficulty": "easy", "content": "شرح الأعداد ..." },
+    { "id": "math2", "subjectId": "math", "title": "الجمع والطرح", "difficulty": "easy", "content": "شرح الجمع ..." },
+    { "id": "math3", "subjectId": "math", "title": "الضرب والقسمة", "difficulty": "medium", "content": "شرح الضرب ..." },
+    { "id": "arabic1", "subjectId": "arabic", "title": "الحروف الهجائية", "difficulty": "easy", "content": "شرح الحروف ..." },
+    { "id": "arabic2", "subjectId": "arabic", "title": "المفرد والمثنى والجمع", "difficulty": "medium", "content": "شرح المفرد ..." },
+    { "id": "prep-math1", "subjectId": "math-prep", "title": "النسبة والتناسب", "difficulty": "medium", "content": "شرح النسبة ..." },
+    { "id": "prep-math2", "subjectId": "math-prep", "title": "المعادلات الخطية", "difficulty": "hard", "content": "شرح المعادلات ..." },
+    { "id": "prep-phys1", "subjectId": "physics", "title": "الحركة والسرعة", "difficulty": "medium", "content": "شرح الحركة ..." },
+    { "id": "sec-math1", "subjectId": "math-sec", "title": "التفاضل", "difficulty": "hard", "content": "شرح التفاضل ..." },
+    { "id": "sec-math2", "subjectId": "math-sec", "title": "التكامل", "difficulty": "hard", "content": "شرح التكامل ..." },
+    { "id": "sec-chem1", "subjectId": "chemistry-sec", "title": "الذرة والتوزيع الإلكتروني", "difficulty": "medium", "content": "شرح الذرة ..." },
+    { "id": "sec-chem2", "subjectId": "chemistry-sec", "title": "التفاعلات الكيميائية", "difficulty": "hard", "content": "شرح التفاعلات ..." }
+]
