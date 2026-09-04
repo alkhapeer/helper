@@ -1,25 +1,36 @@
 // ================================================================
-// التحكم العام في التطبيق
-// ================================================================
-
 // المتغيرات العامة
+// ================================================================
 let SUBJECTS = [];
 let LESSONS = [];
 let TESTS = [];
 
-// تحميل البيانات (نفترض أنها معرفة من script src)
-function initData() {
-  // البيانات تأتي من ملفات JSON المضمنة عبر <script>
-  // نستخدم المتغيرات العامة التي تم تعيينها
-  SUBJECTS = window.SUBJECTS || [];
-  LESSONS = window.LESSONS || [];
-  TESTS = window.TESTS || [];
-  initApp();
+// ================================================================
+// تحميل البيانات من ملفات JSON
+// ================================================================
+async function loadAllData() {
+  try {
+    const [subs, less, tests] = await Promise.all([
+      fetch('data/subjects.json').then(r => r.json()),
+      fetch('data/lessons.json').then(r => r.json()),
+      fetch('data/tests.json').then(r => r.json())
+    ]);
+    SUBJECTS = subs;
+    LESSONS = less;
+    TESTS = tests;
+    initApp();
+  } catch (error) {
+    console.error('خطأ في تحميل البيانات:', error);
+    // محاولة استخدام بيانات افتراضية في حال فشل التحميل
+    alert('حدث خطأ في تحميل البيانات، تأكد من وجود ملفات JSON.');
+  }
 }
 
-// دوال التنقل بين الصفحات
+// ================================================================
+// التنقل بين الصفحات
+// ================================================================
 function navigateTo(page) {
-  switch(page) {
+  switch (page) {
     case 'home': renderHome(); break;
     case 'train': renderTrain(); break;
     case 'test': renderTests(); break;
@@ -31,14 +42,18 @@ function navigateTo(page) {
   });
 }
 
-// عرض مودال عام
+// ================================================================
+// المودال
+// ================================================================
 function showModal(html) {
   document.getElementById('contentModalBody').innerHTML = html;
   document.getElementById('contentModal').classList.add('active');
 }
+
 function closeModal() {
   document.getElementById('contentModal').classList.remove('active');
 }
+
 document.getElementById('contentModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
@@ -82,6 +97,7 @@ function completeLesson(lessonId) {
   saveUser(user);
   closeModal();
   renderHome();
+  updateHeader();
   alert('✅ تم إكمال الدرس بنجاح!');
 }
 
@@ -132,10 +148,11 @@ function startTest(testId) {
       <div class="result-box">
         <div class="score-big">${percent}%</div>
         <div>الإجابات الصحيحة: ${correct} من ${test.questions.length}</div>
-        <button class="btn btn-sm btn-success" onclick="closeModal(); renderHome();" style="margin-top:10px;">عرض النتائج</button>
+        <button class="btn btn-sm btn-success" onclick="closeModal(); renderHome(); updateHeader();" style="margin-top:10px;">عرض النتائج</button>
       </div>
     `;
     document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
+    updateHeader();
   });
 }
 
@@ -190,6 +207,7 @@ function resetProgress() {
     def.stage = oldUser.stage || '';
     saveUser(def);
     renderHome();
+    updateHeader();
   }
 }
 
@@ -207,7 +225,19 @@ function addSampleData() {
   });
   saveUser(user);
   renderHome();
+  updateHeader();
   alert(`تمت إضافة ${added} دروس نموذجية!`);
+}
+
+// ================================================================
+// تحديث الرأس
+// ================================================================
+
+function updateHeader() {
+  const user = loadUser();
+  document.getElementById('userNameDisplay').textContent = user.name || 'طالب';
+  document.getElementById('userStageDisplay').textContent = user.stage || '';
+  document.getElementById('userPointsDisplay').textContent = user.points || 0;
 }
 
 // ================================================================
@@ -216,7 +246,7 @@ function addSampleData() {
 
 function initApp() {
   let user = loadUser();
-  
+
   // إذا لم تكن هناك مرحلة محددة، نعرض شاشة الترحيب
   if (!user.stage) {
     document.getElementById('welcomeModal').classList.add('active');
@@ -243,31 +273,24 @@ function initApp() {
   navigateTo('home');
 }
 
-function updateHeader() {
-  const user = loadUser();
-  document.getElementById('userNameDisplay').textContent = user.name || 'طالب';
-  document.getElementById('userStageDisplay').textContent = user.stage || '';
-  document.getElementById('userPointsDisplay').textContent = user.points || 0;
-}
+// ================================================================
+// ربط الأحداث
+// ================================================================
 
-// ربط أزرار التنقل
 document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
   btn.addEventListener('click', function() {
     navigateTo(this.dataset.page);
   });
 });
 
-// إغلاق مودال الترحيب عند الضغط خارج الصندوق
 document.getElementById('welcomeModal').addEventListener('click', function(e) {
   if (e.target === this) {
-    // لا نغلق إذا كان المستخدم جديداً، لأنها إجبارية
     const user = loadUser();
     if (!user.stage) return;
     this.classList.remove('active');
   }
 });
 
-// تحديد المرحلة في شاشة الترحيب
 document.querySelectorAll('#stageOptions button').forEach(btn => {
   btn.addEventListener('click', function() {
     document.querySelectorAll('#stageOptions button').forEach(b => b.classList.remove('active'));
@@ -275,11 +298,8 @@ document.querySelectorAll('#stageOptions button').forEach(btn => {
   });
 });
 
-// تحميل البيانات وبدء التطبيق
-function startApp() {
-  // المتغيرات SUBJECTS, LESSONS, TESTS تم تعيينها من ملفات JSON
-  initData();
-}
+// ================================================================
+// بدء التطبيق
+// ================================================================
 
-// انتظار تحميل الصفحة
-document.addEventListener('DOMContentLoaded', startApp);
+document.addEventListener('DOMContentLoaded', loadAllData);
