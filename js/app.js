@@ -1,254 +1,285 @@
-// تحميل البيانات من JSON (نفترض أنها معرفة عالمياً)
+// ================================================================
+// التحكم العام في التطبيق
+// ================================================================
+
+// المتغيرات العامة
 let SUBJECTS = [];
 let LESSONS = [];
 let TESTS = [];
 
-// تحميل البيانات (سنقوم بجلبها عبر fetch أو تضمينها)
-async function loadData() {
-    try {
-        const [subs, less, tests] = await Promise.all([
-            fetch('data/subjects.json').then(r => r.json()),
-            fetch('data/lessons.json').then(r => r.json()),
-            fetch('data/tests.json').then(r => r.json())
-        ]);
-        SUBJECTS = subs;
-        LESSONS = less;
-        TESTS = tests;
-        initApp();
-    } catch (e) {
-        // في حال عدم وجود خادم، نستخدم البيانات المضمنة (تعريفات احتياطية)
-        console.warn('استخدام البيانات المضمنة');
-        // يمكن وضع بيانات افتراضية هنا
-        initApp();
-    }
+// تحميل البيانات (نفترض أنها معرفة من script src)
+function initData() {
+  // البيانات تأتي من ملفات JSON المضمنة عبر <script>
+  // نستخدم المتغيرات العامة التي تم تعيينها
+  SUBJECTS = window.SUBJECTS || [];
+  LESSONS = window.LESSONS || [];
+  TESTS = window.TESTS || [];
+  initApp();
 }
 
-// دوال مساعدة عامة
-function getSubjectsForStage(stage) {
-    if (stage === 'all') return SUBJECTS;
-    return SUBJECTS.filter(s => s.stage === stage);
-}
-
-function getOverallProgress(user) {
-    const total = LESSONS.length;
-    const completed = user.completedLessons.length;
-    return total > 0 ? Math.round((completed / total) * 100) : 0;
-}
-
-function getWeakTopics(user) {
-    const map = {};
-    user.testResults.forEach(tr => {
-        const test = TESTS.find(t => t.id === tr.testId);
-        if (!test) return;
-        const subject = SUBJECTS.find(s => s.id === test.subjectId);
-        if (!subject) return;
-        if (!map[subject.name]) map[subject.name] = [];
-        map[subject.name].push(tr.score);
-    });
-    const weak = [];
-    for (let sub in map) {
-        const avg = map[sub].reduce((a,b) => a+b, 0) / map[sub].length;
-        if (avg < 70) weak.push({ subject: sub, score: Math.round(avg) });
-    }
-    weak.sort((a,b) => a.score - b.score);
-    return weak;
-}
-
-function getStrengths(user) {
-    const map = {};
-    user.testResults.forEach(tr => {
-        const test = TESTS.find(t => t.id === tr.testId);
-        if (!test) return;
-        const subject = SUBJECTS.find(s => s.id === test.subjectId);
-        if (!subject) return;
-        if (!map[subject.name]) map[subject.name] = [];
-        map[subject.name].push(tr.score);
-    });
-    const strong = [];
-    for (let sub in map) {
-        const avg = map[sub].reduce((a,b) => a+b, 0) / map[sub].length;
-        if (avg >= 80) strong.push({ subject: sub, score: Math.round(avg) });
-    }
-    strong.sort((a,b) => b.score - a.score);
-    return strong;
-}
-
-function generatePlan(user) {
-    const days = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
-    const weak = getWeakTopics(user);
-    const plan = [];
-    const minutes = user.dailyMinutes || 60;
-    for (let i = 0; i < 7; i++) {
-        let task = 'مراجعة عامة';
-        if (weak.length > 0 && i < weak.length) task = `تدريب على ${weak[i].subject}`;
-        else if (i === 0) task = 'مراجعة الأخطاء';
-        else if (i === 1) task = 'اختبار قصير';
-        else if (i === 2) task = 'حل تمارين متنوعة';
-        else if (i === 3) task = 'مراجعة المفاهيم الأساسية';
-        else if (i === 4) task = 'تدريب على المهارات الضعيفة';
-        else if (i === 5) task = 'اختبار تجريبي';
-        else task = 'مراجعة شاملة';
-        const oldPlan = user.plan || [];
-        const oldItem = oldPlan.find(p => p.day === days[i]);
-        plan.push({ day: days[i], task, done: oldItem ? oldItem.done : false });
-    }
-    return plan;
-}
-
-// دوال التنقل
+// دوال التنقل بين الصفحات
 function navigateTo(page) {
-    // إعادة توجيه لتحميل الصفحة المناسبة
-    switch(page) {
-        case 'home': renderHome(); break;
-        case 'train': renderTrain(); break;
-        case 'test': renderTests(); break;
-        case 'analysis': renderAnalysis(); break;
-        case 'plan': renderPlan(); break;
-    }
-    // تحديث شريط التنقل
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === page);
-    });
+  switch(page) {
+    case 'home': renderHome(); break;
+    case 'train': renderTrain(); break;
+    case 'test': renderTests(); break;
+    case 'analysis': renderAnalysis(); break;
+    case 'plan': renderPlan(); break;
+  }
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === page);
+  });
 }
 
-// المودال
+// عرض مودال عام
 function showModal(html) {
-    document.getElementById('modalContent').innerHTML = html;
-    document.getElementById('modalOverlay').classList.add('active');
+  document.getElementById('contentModalBody').innerHTML = html;
+  document.getElementById('contentModal').classList.add('active');
 }
 function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
+  document.getElementById('contentModal').classList.remove('active');
 }
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+document.getElementById('contentModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
 });
 
+// ================================================================
 // دوال تفاعل الدروس والاختبارات
+// ================================================================
+
 function openLesson(lessonId) {
-    const lesson = LESSONS.find(l => l.id === lessonId);
-    if (!lesson) return;
-    const user = loadUser();
-    if (user.completedLessons.includes(lessonId)) return alert('هذا الدرس مكتمل!');
-    const html = `
-        <h2>${lesson.title}</h2>
-        <div class="text-muted">${SUBJECTS.find(s=>s.id===lesson.subjectId)?.name || ''}</div>
-        <div style="background:#f8faff; padding:16px; border-radius:16px; line-height:1.8; margin:12px 0;">${lesson.content || 'لا يوجد محتوى حالياً.'}</div>
-        <div class="modal-actions">
-            <button class="btn btn-outline" onclick="closeModal()">رجوع</button>
-            <button class="btn btn-success" onclick="completeLesson('${lessonId}')">إنهاء الدرس</button>
-        </div>
-    `;
-    showModal(html);
+  const lesson = LESSONS.find(l => l.id === lessonId);
+  if (!lesson) return;
+  const user = loadUser();
+  if (user.completedLessons.includes(lessonId)) {
+    alert('هذا الدرس مكتمل بالفعل!');
+    return;
+  }
+  const subject = SUBJECTS.find(s => s.id === lesson.subjectId);
+  const html = `
+    <h2>${lesson.title}</h2>
+    <div class="text-muted">${subject ? subject.name : ''} • ${lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم'}</div>
+    <div style="background:#f8faff; padding:16px; border-radius:16px; line-height:1.8; margin:12px 0;">
+      ${lesson.content || 'لا يوجد محتوى حالياً.'}
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">رجوع</button>
+      <button class="btn btn-success" onclick="completeLesson('${lessonId}')">إنهاء الدرس</button>
+    </div>
+  `;
+  showModal(html);
 }
 
 function completeLesson(lessonId) {
-    const user = loadUser();
-    if (user.completedLessons.includes(lessonId)) { closeModal(); return; }
-    user.completedLessons.push(lessonId);
-    user.points += 10;
-    const plan = user.plan.length ? user.plan : generatePlan(user);
-    const firstPending = plan.find(p => !p.done);
-    if (firstPending) firstPending.done = true;
-    user.plan = plan;
-    saveUser(user);
-    closeModal();
-    navigateTo('home');
-    alert('✅ تم إكمال الدرس بنجاح!');
+  const user = loadUser();
+  if (user.completedLessons.includes(lessonId)) { closeModal(); return; }
+  user.completedLessons.push(lessonId);
+  user.points = (user.points || 0) + 10;
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  const firstPending = plan.find(p => !p.done);
+  if (firstPending) firstPending.done = true;
+  user.plan = plan;
+  saveUser(user);
+  closeModal();
+  renderHome();
+  alert('✅ تم إكمال الدرس بنجاح!');
 }
 
 function startTest(testId) {
-    const test = TESTS.find(t => t.id === testId);
-    if (!test) return;
-    const user = loadUser();
-    if (user.testResults.find(r => r.testId === testId)) return alert('قمت بهذا الاختبار بالفعل.');
-    let html = `<h2>${test.title}</h2><form id="quizForm">`;
-    test.questions.forEach((q, idx) => {
-        html += `
-            <div style="background:#f8faff; padding:12px; border-radius:16px; margin-bottom:12px;">
-                <div style="font-weight:600; margin-bottom:8px;">${idx+1}. ${q.q}</div>
-                ${q.options.map((opt, oi) => `<label class="option"><input type="radio" name="q${idx}" value="${oi}" required /> ${opt}</label>`).join('')}
-            </div>
-        `;
-    });
+  const test = TESTS.find(t => t.id === testId);
+  if (!test) return;
+  const user = loadUser();
+  if (user.testResults.find(r => r.testId === testId)) {
+    alert('قمت بهذا الاختبار بالفعل.');
+    return;
+  }
+  let html = `<h2>${test.title}</h2><form id="quizForm">`;
+  test.questions.forEach((q, idx) => {
     html += `
-        <div class="modal-actions">
-            <button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button>
-            <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> إرسال</button>
-        </div>
-    </form>
-    <div id="quizResult"></div>
+      <div style="background:#f8faff; padding:12px; border-radius:16px; margin-bottom:12px;">
+        <div style="font-weight:600; margin-bottom:8px;">${idx+1}. ${q.q}</div>
+        ${q.options.map((opt, oi) => `
+          <label class="option"><input type="radio" name="q${idx}" value="${oi}" required /> ${opt}</label>
+        `).join('')}
+      </div>
     `;
-    showModal(html);
+  });
+  html += `
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+      <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> إرسال</button>
+    </div>
+  </form>
+  <div id="quizResult"></div>
+  `;
+  showModal(html);
 
-    document.getElementById('quizForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        let correct = 0;
-        test.questions.forEach((q, idx) => {
-            const selected = formData.get(`q${idx}`);
-            if (selected !== null && parseInt(selected) === q.correct) correct++;
-        });
-        const percent = Math.round((correct / test.questions.length) * 100);
-        if (!user.testResults.find(r => r.testId === testId)) {
-            user.testResults.push({ testId, score: percent });
-            user.points += 20;
-            saveUser(user);
-        }
-        document.getElementById('quizResult').innerHTML = `
-            <div class="result-box">
-                <div class="score-big">${percent}%</div>
-                <div>الإجابات الصحيحة: ${correct} من ${test.questions.length}</div>
-                <button class="btn btn-sm btn-success" onclick="closeModal(); navigateTo('home');" style="margin-top:10px;">عرض النتائج</button>
-            </div>
-        `;
-        document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
+  document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    let correct = 0;
+    test.questions.forEach((q, idx) => {
+      const selected = formData.get(`q${idx}`);
+      if (selected !== null && parseInt(selected) === q.correct) correct++;
     });
+    const percent = Math.round((correct / test.questions.length) * 100);
+    if (!user.testResults.find(r => r.testId === testId)) {
+      user.testResults.push({ testId, score: percent });
+      user.points = (user.points || 0) + 20;
+      saveUser(user);
+    }
+    document.getElementById('quizResult').innerHTML = `
+      <div class="result-box">
+        <div class="score-big">${percent}%</div>
+        <div>الإجابات الصحيحة: ${correct} من ${test.questions.length}</div>
+        <button class="btn btn-sm btn-success" onclick="closeModal(); renderHome();" style="margin-top:10px;">عرض النتائج</button>
+      </div>
+    `;
+    document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
+  });
 }
 
 function togglePlanDay(idx) {
-    const user = loadUser();
-    const plan = user.plan.length ? user.plan : generatePlan(user);
-    if (idx >= 0 && idx < plan.length) {
-        plan[idx].done = !plan[idx].done;
-        user.plan = plan;
-        saveUser(user);
-        renderPlan();
-    }
+  const user = loadUser();
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  if (idx >= 0 && idx < plan.length) {
+    plan[idx].done = !plan[idx].done;
+    user.plan = plan;
+    saveUser(user);
+    renderPlan();
+  }
 }
 
 function generatePlanFromUI() {
-    const user = loadUser();
-    user.plan = generatePlan(user);
-    saveUser(user);
-    renderPlan();
-    alert('تم إعادة بناء الخطة بنجاح!');
+  const user = loadUser();
+  user.plan = generatePlan(user);
+  saveUser(user);
+  renderPlan();
+  alert('تم إعادة بناء الخطة بنجاح!');
 }
 
-// تهيئة التطبيق
+// ================================================================
+// إدارة الملف الشخصي
+// ================================================================
+
+function editProfile() {
+  const user = loadUser();
+  document.getElementById('inputName').value = user.name || '';
+  document.querySelectorAll('#stageOptions button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.stage === user.stage);
+  });
+  document.getElementById('welcomeTitle').textContent = 'تعديل الملف الشخصي';
+  document.getElementById('welcomeSub').textContent = 'يمكنك تغيير اسمك ومرحلتك';
+  document.getElementById('startAppBtn').textContent = 'حفظ التغييرات';
+  document.getElementById('welcomeModal').classList.add('active');
+}
+
+function closeWelcomeModal() {
+  document.getElementById('welcomeModal').classList.remove('active');
+}
+
+// ================================================================
+// دوال مساعدة (إعادة تعيين، بيانات نموذجية)
+// ================================================================
+
+function resetProgress() {
+  if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
+    const oldUser = loadUser();
+    const def = getDefaultUser();
+    def.name = oldUser.name || '';
+    def.stage = oldUser.stage || '';
+    saveUser(def);
+    renderHome();
+  }
+}
+
+function addSampleData() {
+  const user = loadUser();
+  const stageLessons = getLessonsForStage(user.stage);
+  const sampleIds = stageLessons.slice(0, 3).map(l => l.id);
+  let added = 0;
+  sampleIds.forEach(id => {
+    if (!user.completedLessons.includes(id)) {
+      user.completedLessons.push(id);
+      user.points = (user.points || 0) + 10;
+      added++;
+    }
+  });
+  saveUser(user);
+  renderHome();
+  alert(`تمت إضافة ${added} دروس نموذجية!`);
+}
+
+// ================================================================
+// التهيئة الأولية
+// ================================================================
+
 function initApp() {
-    let user = loadUser();
-    if (!user.plan || user.plan.length === 0) {
-        user.plan = generatePlan(user);
-        saveUser(user);
-    }
-    if (!user.name || user.name === 'طالب') {
-        const name = prompt('مرحباً! ما اسمك؟', 'طالب');
-        if (name && name.trim()) {
-            user.name = name.trim();
-            saveUser(user);
-        }
-    }
-    // عرض الصفحة الافتراضية
-    navigateTo('home');
-    // تحديث اسم المستخدم في الرأس
-    document.getElementById('userNameDisplay').textContent = user.name;
-    // ربط أزرار التنقل
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
-        btn.addEventListener('click', function() {
-            navigateTo(this.dataset.page);
-        });
-    });
+  let user = loadUser();
+  
+  // إذا لم تكن هناك مرحلة محددة، نعرض شاشة الترحيب
+  if (!user.stage) {
+    document.getElementById('welcomeModal').classList.add('active');
+    document.getElementById('startAppBtn').onclick = function() {
+      const name = document.getElementById('inputName').value.trim();
+      const stage = document.querySelector('#stageOptions button.active')?.dataset.stage || 'ثانوي';
+      if (!name) {
+        alert('الرجاء إدخال اسمك');
+        return;
+      }
+      user.name = name;
+      user.stage = stage;
+      user.plan = generatePlan(user);
+      saveUser(user);
+      closeWelcomeModal();
+      updateHeader();
+      navigateTo('home');
+    };
+    return;
+  }
+
+  // إذا كانت المرحلة موجودة، نعرض التطبيق مباشرة
+  updateHeader();
+  navigateTo('home');
 }
 
-// تحميل البيانات
-loadData();
+function updateHeader() {
+  const user = loadUser();
+  document.getElementById('userNameDisplay').textContent = user.name || 'طالب';
+  document.getElementById('userStageDisplay').textContent = user.stage || '';
+  document.getElementById('userPointsDisplay').textContent = user.points || 0;
+}
+
+// ربط أزرار التنقل
+document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+  btn.addEventListener('click', function() {
+    navigateTo(this.dataset.page);
+  });
+});
+
+// إغلاق مودال الترحيب عند الضغط خارج الصندوق
+document.getElementById('welcomeModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    // لا نغلق إذا كان المستخدم جديداً، لأنها إجبارية
+    const user = loadUser();
+    if (!user.stage) return;
+    this.classList.remove('active');
+  }
+});
+
+// تحديد المرحلة في شاشة الترحيب
+document.querySelectorAll('#stageOptions button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#stageOptions button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// تحميل البيانات وبدء التطبيق
+function startApp() {
+  // المتغيرات SUBJECTS, LESSONS, TESTS تم تعيينها من ملفات JSON
+  initData();
+}
+
+// انتظار تحميل الصفحة
+document.addEventListener('DOMContentLoaded', startApp);
