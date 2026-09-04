@@ -6,7 +6,7 @@
   <title>مركز التحكم الشخصي</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    /* جميع الأنماط السابقة تبقى كما هي، نضيف فقط أنماط جديدة للدروس */
+    /* جميع الأنماط السابقة مع إضافة أنماط المودال */
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
     body { background:#f4f7fc; padding:20px; max-width:480px; margin:0 auto; }
     .app { background:white; border-radius:28px; box-shadow:0 10px 30px rgba(0,0,0,0.05); padding:24px 20px 30px; }
@@ -45,40 +45,68 @@
     .btn:active { transform:scale(0.95); }
     .btn-outline { background:transparent; border:1px solid #5b7cfa; color:#5b7cfa; }
     .btn-success { background:#34c759; }
+    .btn-danger { background:#ff3b30; }
     .mt-2 { margin-top:12px; }
     .text-muted { color:#8a9bb5; font-size:14px; }
     .text-center { text-align:center; }
     .divider { height:1px; background:#e9edf4; margin:12px 0; }
 
-    /* أنماط قائمة الدروس */
-    .lesson-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f4f8;
-    }
-    .lesson-item:last-child { border-bottom: none; }
+    .lesson-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f4f8; }
+    .lesson-item:last-child { border-bottom:none; }
     .lesson-item .info { display:flex; flex-direction:column; gap:4px; }
     .lesson-item .info .title { font-weight:600; color:#1a2b4a; }
     .lesson-item .info .subject { font-size:13px; color:#8a9bb5; }
     .lesson-item .actions { display:flex; gap:8px; align-items:center; }
-    .lesson-item .actions .completed-badge { background:#e0f2e0; color:#1a7a3a; padding:4px 12px; border-radius:30px; font-size:12px; font-weight:600; }
-    .lesson-item .actions .btn-start { background:#5b7cfa; color:white; border:none; padding:6px 16px; border-radius:30px; font-size:13px; cursor:pointer; transition:0.2s; }
-    .lesson-item .actions .btn-start:active { transform:scale(0.95); }
-    .lesson-item .actions .btn-start:disabled { opacity:0.5; cursor:not-allowed; }
+    .completed-badge { background:#e0f2e0; color:#1a7a3a; padding:4px 12px; border-radius:30px; font-size:12px; font-weight:600; }
+    .btn-start { background:#5b7cfa; color:white; border:none; padding:6px 16px; border-radius:30px; font-size:13px; cursor:pointer; transition:0.2s; }
+    .btn-start:active { transform:scale(0.95); }
+
+    /* المودال */
+    .modal-overlay {
+      display:none;
+      position:fixed;
+      top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      backdrop-filter:blur(4px);
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+      padding:20px;
+    }
+    .modal-overlay.active { display:flex; }
+    .modal-box {
+      background:white;
+      max-width:500px;
+      width:100%;
+      max-height:90vh;
+      overflow-y:auto;
+      border-radius:28px;
+      padding:24px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal-box h2 { font-size:22px; margin-bottom:8px; color:#1a2b4a; }
+    .modal-box .sub { color:#8a9bb5; margin-bottom:16px; }
+    .modal-box .content { background:#f8faff; padding:16px; border-radius:16px; margin:12px 0; line-height:1.8; }
+    .modal-box .question-item { background:#f8faff; padding:16px; border-radius:16px; margin-bottom:16px; }
+    .modal-box .question-item .q-text { font-weight:600; margin-bottom:10px; }
+    .modal-box .option { display:block; padding:8px 12px; margin:4px 0; background:white; border-radius:10px; border:1px solid #e9edf4; cursor:pointer; transition:0.2s; }
+    .modal-box .option:hover { background:#eef2f9; }
+    .modal-box .option input[type="radio"] { margin-left:10px; }
+    .modal-box .option.selected { border-color:#5b7cfa; background:#e0e8ff; }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap; }
+    .result-box { background:#e0f2e0; padding:16px; border-radius:16px; text-align:center; margin-top:10px; }
+    .result-box .score-big { font-size:32px; font-weight:700; color:#1a2b4a; }
   </style>
 </head>
 <body>
 <div class="app" id="app">
 
-  <!-- HEADER -->
   <div class="header">
     <h1>مرحباً، <span id="userName" class="clickable-name" onclick="changeName()">(اضغط لتحديد اسمك)</span></h1>
     <div class="user"><i class="fas fa-user-circle"></i> <span id="userPoints">0</span> نقطة</div>
   </div>
 
-  <!-- ========== بطاقات الإحصائيات ========== -->
+  <!-- بطاقات الإحصائيات -->
   <div class="card">
     <div class="card-title"><span><i class="fas fa-bullseye"></i> هدفي</span><span class="badge" id="goalDisplay">90%</span></div>
     <div class="flex-row"><span class="stat">التقدم العام</span><span class="stat" id="progressPercent">0%</span></div>
@@ -96,31 +124,27 @@
     <div id="weakTopicsContainer"><div class="text-muted">لا توجد نقاط ضعف مسجلة</div></div>
   </div>
 
-  <div class="card" onclick="goTo('test')">
-    <div class="card-title"><span><i class="fas fa-clock"></i> الاختبار القادم</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+  <div class="card">
+    <div class="card-title"><span><i class="fas fa-clock"></i> الاختبار القادم</span></div>
     <div id="nextTestContainer"><div class="text-muted">لا توجد اختبارات قادمة</div></div>
   </div>
 
   <div class="card" onclick="goTo('achievements')">
-    <div class="card-title"><span><i class="fas fa-trophy" style="color:#fbbf24;"></i> إنجازاتي</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div class="card-title"><span><i class="fas fa-trophy" style="color:#fbbf24;"></i> إنجازاتي</span></div>
     <div id="achievementsContainer"><span class="text-muted">لا توجد إنجازات بعد</span></div>
   </div>
 
   <div class="card" onclick="goTo('recommend')">
-    <div class="card-title"><span><i class="fas fa-lightbulb" style="color:#5b7cfa;"></i> توصيات لك</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div class="card-title"><span><i class="fas fa-lightbulb" style="color:#5b7cfa;"></i> توصيات لك</span></div>
     <div id="recommendationsContainer"><div class="text-muted">توصيات مخصصة ستظهر هنا</div></div>
   </div>
 
-  <!-- ========== قائمة الدروس (الجديدة) ========== -->
+  <!-- قائمة الدروس -->
   <div class="card">
     <div class="card-title"><span><i class="fas fa-book-open"></i> الدروس المتاحة</span><span class="badge" id="lessonsCount">0</span></div>
-    <div id="lessonsListContainer">
-      <!-- ستُملأ بواسطة JavaScript -->
-      <div class="text-muted">لا توجد دروس حالياً</div>
-    </div>
+    <div id="lessonsListContainer"><div class="text-muted">لا توجد دروس حالياً</div></div>
   </div>
 
-  <!-- ========== أزرار الإجراءات ========== -->
   <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
     <button class="btn btn-outline" onclick="resetProgress()" style="flex:1;"><i class="fas fa-undo"></i> إعادة تعيين</button>
     <button class="btn" onclick="addSampleData()" style="flex:1;"><i class="fas fa-plus"></i> إضافة بيانات نموذجية</button>
@@ -130,40 +154,44 @@
   </div>
 </div>
 
+<!-- ===== مودال العرض العام ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
 <script>
   // ============================================================
-  // 1. تعريف البيانات الأساسية (الدروس، الاختبارات، الإنجازات)
+  // 1. البيانات (تم إضافة حقل content لكل درس)
   // ============================================================
-
-  // --- دروس (مقررات) --- تم تصحيح الأخطاء وإضافة الفواصل والأقواس
   const LESSONS_DATA = [
-    { id: 'math-01', subject: 'الرياضيات', title: 'الدوال', difficulty: 'medium' },
-    { id: 'math-02', subject: 'الرياضيات', title: 'التفاضل', difficulty: 'hard' },
-    { id: 'math-03', subject: 'الرياضيات', title: 'المعادلات', difficulty: 'medium' },
-    { id: 'arabic-01', subject: 'اللغة العربية', title: 'النحو', difficulty: 'easy' },
-    { id: 'arabic-02', subject: 'اللغة العربية', title: 'البلاغة', difficulty: 'medium' },
-    { id: 'physics-01', subject: 'الفيزياء', title: 'الحركة', difficulty: 'hard' },
-    { id: 'physics-02', subject: 'الفيزياء', title: 'القوى', difficulty: 'medium' },
-    { id: 'english-01', subject: 'اللغة الإنجليزية', title: 'المحادثة', difficulty: 'easy' },
-    // دروس الكيمياء (تم تصحيح الأخطاء)
-    { id: 'chem1-intro', subject: 'الكيمياء', title: 'مقدمة في علم الكيمياء والطريقة العلمية', difficulty: 'easy' },
-    { id: 'chem1-matter', subject: 'الكيمياء', title: 'المادة: الخواص والتغيرات وتصنيفاتها', difficulty: 'easy' },
-    { id: 'chem1-atom', subject: 'الكيمياء', title: 'تركيب الذرة والتوزيع الإلكتروني', difficulty: 'medium' },
-    { id: 'chem1-reactions', subject: 'الكيمياء', title: 'التفاعلات الكيميائية والمعادلات الأيونية', difficulty: 'medium' },
-    { id: 'chem1-mole', subject: 'الكيمياء', title: 'المول والحسابات الكيميائية وصيغ المركبات', difficulty: 'hard' },
-    { id: 'chem2-energy', subject: 'الكيمياء', title: 'الطاقة والتغيرات الكيميائية (الكيمياء الحرارية)', difficulty: 'medium' },
-    { id: 'chem2-speed', subject: 'الكيمياء', title: 'سرعة التفاعلات الكيميائية ورتب التفاعل', difficulty: 'hard' },
-    { id: 'chem2-equilibrium', subject: 'الكيمياء', title: 'الاتزان الكيميائي ومبدأ لوتشاتيليه', difficulty: 'hard' },
-    { id: 'chem2-hydrocarbons', subject: 'الكيمياء', title: 'الهيدروكربونات وتسمية الـ IUPAC', difficulty: 'medium' },
-    { id: 'chem2-derivatives', subject: 'الكيمياء', title: 'مشتقات الهيدروكربونات والمجموعات الوظيفية', difficulty: 'medium' },
-    { id: 'chem2-biochemistry', subject: 'الكيمياء', title: 'المركبات العضوية الحيوية (البروتينات والسكريات)', difficulty: 'easy' },
-    { id: 'chem3-mixtures', subject: 'الكيمياء', title: 'المخاليط والمحاليل والخواص الجامعة', difficulty: 'easy' },
-    { id: 'chem3-acids', subject: 'الكيمياء', title: 'الأحماض والقواعد ومقياس الرقم الهيدروجيني pH', difficulty: 'hard' },
-    { id: 'chem3-redox', subject: 'الكيمياء', title: 'تفاعلات الأكسدة والاختزال ووزن المعادلات', difficulty: 'medium' },
-    { id: 'chem3-electro', subject: 'الكيمياء', title: 'الكيمياء الكهربائية (الخلايا الجلفانية والطلاء بالكهرباء)', difficulty: 'hard' }
+    { id: 'math-01', subject: 'الرياضيات', title: 'الدوال', difficulty: 'medium', content: 'الدوال هي علاقة تربط كل عنصر في مجموعة بمجموعة أخرى. مثال: f(x) = x². في هذا الدرس ستتعلم تعريف الدوال، مجالها، ومداها، وكيفية تمثيلها بيانياً.' },
+    { id: 'math-02', subject: 'الرياضيات', title: 'التفاضل', difficulty: 'hard', content: 'التفاضل هو فرع من الرياضيات يهتم بمعدل تغير الدوال. سنتعلم قاعدة القوة، قاعدة السلسلة، وكيفية إيجاد المشتقات.' },
+    { id: 'math-03', subject: 'الرياضيات', title: 'المعادلات', difficulty: 'medium', content: 'حل المعادلات من الدرجة الأولى والثانية، باستخدام التحليل، الجذر التربيعي، والقانون العام.' },
+    { id: 'arabic-01', subject: 'اللغة العربية', title: 'النحو', difficulty: 'easy', content: 'مقدمة في النحو العربي: أقسام الكلام، علامات الإعراب الأصلية والفرعية، تطبيقات على الجملة الاسمية والفعلية.' },
+    { id: 'arabic-02', subject: 'اللغة العربية', title: 'البلاغة', difficulty: 'medium', content: 'علم البلاغة: التشبيه، الاستعارة، الكناية، وأساليب الإنشاء والخبر.' },
+    { id: 'physics-01', subject: 'الفيزياء', title: 'الحركة', difficulty: 'hard', content: 'دراسة الحركة في خط مستقيم، السرعة المتجهة، التسارع، والمعادلات الحركية.' },
+    { id: 'physics-02', subject: 'الفيزياء', title: 'القوى', difficulty: 'medium', content: 'قوانين نيوتن للحركة، القوى المؤثرة على الأجسام، وتحليل الحركة باستخدام مخططات الجسم الحر.' },
+    { id: 'english-01', subject: 'اللغة الإنجليزية', title: 'المحادثة', difficulty: 'easy', content: 'جمل وعبارات شائعة في المحادثة اليومية، نطق الحروف، وقواعد أساسية للتواصل.' },
+    // الكيمياء مع محتوى
+    { id: 'chem1-intro', subject: 'الكيمياء', title: 'مقدمة في علم الكيمياء والطريقة العلمية', difficulty: 'easy', content: 'الكيمياء هي علم المادة وتفاعلاتها. الطريقة العلمية خطوات لحل المشكلات: الملاحظة، الفرضية، التجربة، الاستنتاج.' },
+    { id: 'chem1-matter', subject: 'الكيمياء', title: 'المادة: الخواص والتغيرات وتصنيفاتها', difficulty: 'easy', content: 'المادة لها خواص فيزيائية وكيميائية. تصنف إلى عناصر ومركبات ومخاليط. التغيرات الفيزيائية لا تغير الهوية، بينما الكيميائية تحدث تفاعلات.' },
+    { id: 'chem1-atom', subject: 'الكيمياء', title: 'تركيب الذرة والتوزيع الإلكتروني', difficulty: 'medium', content: 'الذرة تتكون من بروتونات ونيوترونات في النواة وإلكترونات في مدارات. التوزيع الإلكتروني يحدد خصائص العنصر.' },
+    { id: 'chem1-reactions', subject: 'الكيمياء', title: 'التفاعلات الكيميائية والمعادلات الأيونية', difficulty: 'medium', content: 'التفاعلات الكيميائية تحول المواد المتفاعلة إلى ناتجة. المعادلات الأيونية تظهر الأيونات الفعلية في المحلول.' },
+    { id: 'chem1-mole', subject: 'الكيمياء', title: 'المول والحسابات الكيميائية وصيغ المركبات', difficulty: 'hard', content: 'المول هو وحدة قياس كمية المادة، ويساوي 6.022×10²³ وحدة. نستخدمه في حساب كتل المواد والصيغ الكيميائية.' },
+    { id: 'chem2-energy', subject: 'الكيمياء', title: 'الطاقة والتغيرات الكيميائية (الكيمياء الحرارية)', difficulty: 'medium', content: 'دراسة انتقال الحرارة في التفاعلات. الأنظمة الماصة للحرارة والطاردة، وحسابات المحتوى الحراري.' },
+    { id: 'chem2-speed', subject: 'الكيمياء', title: 'سرعة التفاعلات الكيميائية ورتب التفاعل', difficulty: 'hard', content: 'سرعة التفاعل تتأثر بتركيز المواد، درجة الحرارة، والعوامل المساعدة. رتبة التفاعل تحدد قانون السرعة.' },
+    { id: 'chem2-equilibrium', subject: 'الكيمياء', title: 'الاتزان الكيميائي ومبدأ لوتشاتيليه', difficulty: 'hard', content: 'في التفاعلات العكوسة، يصل النظام إلى حالة توازن. مبدأ لوتشاتيليه يشرح كيف يستجيب التوازن للتغيرات.' },
+    { id: 'chem2-hydrocarbons', subject: 'الكيمياء', title: 'الهيدروكربونات وتسمية الـ IUPAC', difficulty: 'medium', content: 'الهيدروكربونات مركبات عضوية تحتوي على كربون وهيدروجين. تعلم تسميتها حسب قواعد IUPAC.' },
+    { id: 'chem2-derivatives', subject: 'الكيمياء', title: 'مشتقات الهيدروكربونات والمجموعات الوظيفية', difficulty: 'medium', content: 'المجموعات الوظيفية مثل الكحول، الألدهيد، الكيتون، والأحماض الكربوكسيلية تحدد خواص المركبات.' },
+    { id: 'chem2-biochemistry', subject: 'الكيمياء', title: 'المركبات العضوية الحيوية (البروتينات والسكريات)', difficulty: 'easy', content: 'البروتينات والسكريات من الجزيئات الحيوية الهامة. تركيبها ووظائفها في الجسم.' },
+    { id: 'chem3-mixtures', subject: 'الكيمياء', title: 'المخاليط والمحاليل والخواص الجامعة', difficulty: 'easy', content: 'المخاليط والمحاليل وأنواعها، الخواص الجامعة مثل الارتفاع في درجة الغليان والانخفاض في درجة التجمد.' },
+    { id: 'chem3-acids', subject: 'الكيمياء', title: 'الأحماض والقواعد ومقياس الرقم الهيدروجيني pH', difficulty: 'hard', content: 'تعريفات الأحماض والقواعد، مقياس pH، وحسابات التركيز.' },
+    { id: 'chem3-redox', subject: 'الكيمياء', title: 'تفاعلات الأكسدة والاختزال ووزن المعادلات', difficulty: 'medium', content: 'تفاعلات الأكسدة والاختزال (Redox) تتضمن انتقال الإلكترونات. طرق وزن المعادلات في الوسط الحمضي والقاعدي.' },
+    { id: 'chem3-electro', subject: 'الكيمياء', title: 'الكيمياء الكهربائية (الخلايا الجلفانية والطلاء بالكهرباء)', difficulty: 'hard', content: 'الخلايا الجلفانية تحول الطاقة الكيميائية إلى كهربائية. الطلاء الكهربائي يستخدم لتغليف المعادن.' }
   ];
 
-  // --- اختبارات ---
   const TESTS_DATA = [
     { id: 'math-test-01', title: 'اختبار الرياضيات (التفاضل)', date: '2026-09-06', duration: 20 },
     { id: 'arabic-test-01', title: 'اختبار اللغة العربية (النحو)', date: '2026-09-10', duration: 15 },
@@ -176,96 +204,71 @@
     { id: 'test-chem3-final', title: 'الاختبار النهائي الشامل (كيمياء 3)', date: '2026-12-25', duration: 40 }
   ];
 
-  // --- أسئلة الاختبارات (صيغة مصفوفة صحيحة) ---
   const QUESTIONS_DATA = [
-    // test-chem1-mid
     { testId: 'test-chem1-mid', question: 'يوجد غاز الأوزون (O3) الذي يحمي الأرض من الأشعة فوق البنفسجية الضارة في طبقة:', options: ['التروبوسفير', 'الستراتوسفير', 'الميزوسفير', 'الأكسوسفير'], correct: 1 },
     { testId: 'test-chem1-mid', question: 'ما فرع علم الكيمياء الذي يستقصي مواد التغليف وتحللها في البيئة؟', options: ['الكيمياء الحيوية', 'الكيمياء العضوية', 'الكيمياء البيئية', 'الكيمياء الفيزيائية'], correct: 2 },
     { testId: 'test-chem1-mid', question: 'الميثاق الدولي الذي يقضي بالحد من استعمال مركبات الكلوروفلوروكربون (CFCs) هو ميثاق:', options: ['مونتريال', 'دوبسون', 'توماس', 'كيوتو'], correct: 0 },
     { testId: 'test-chem1-mid', question: 'عند دراسة أثر درجة الحرارة في حجم بالون، وجد أن حجم البالون يزداد بالتسخين. المتغير المستقل هنا هو:', options: ['حجم البالون', 'درجة الحرارة', 'كمية الهواء في البالون', 'ضغط البالون'], correct: 1 },
-    // test-chem1-final-practical
     { testId: 'test-chem1-final-practical', question: 'أي الفلزات التالية يعتبر الأكثر نشاطاً في سلسلة نشاط الكيمياء العملي مقارنة بالبقرة (Ag, Cu, Pb, Zn, Mg)؟', options: ['الرصاص Pb', 'النحاس Cu', 'المغنيسيوم Mg', 'الخارصين Zn'], correct: 2 },
     { testId: 'test-chem1-final-practical', question: 'ما هو الدليل العملي لموقع الهيدروجين في سلسلة النشاط الكيميائي عند تفاعل النحاس مع حمض الهيدروكلوريك HCl؟', options: ['تغير اللون', 'تصاعد فقاقيع غاز', 'لا يحدث تفاعل (لا شيء)', 'ترسب مادة صلبة'], correct: 2 },
     { testId: 'test-chem1-final-practical', question: 'عند تفاعل الصوديوم مع الماء لإنتاج هيدروكسيد الصوديوم وغاز الهيدروجين، يصنف التفاعل بأنه تفاعل:', options: ['تفكك', 'إحلال بسيط', 'إحلال مزدوج', 'احتراق'], correct: 1 },
-    // test-chem2-mid
     { testId: 'test-chem2-mid', question: 'ما المصطلح الذي يُطلق على الطاقة المخزنة في الروابط الكيميائية للمادة؟', options: ['الطاقة الحركية', 'طاقة الوضع الكيميائية', 'الحرارة النوعية', 'الطاقة الشمسية'], correct: 1 },
     { testId: 'test-chem2-mid', question: 'أي المعادلات التالية تُستعمل لحساب كمية الحرارة الممتصة أو المنطلقة (q)؟', options: ['q = c × m', 'q = c × m × ΔT', 'q = c × m / ΔT', 'q = m × ΔT'], correct: 1 },
     { testId: 'test-chem2-mid', question: 'ما هي وحدة قياس الطاقة والحرارة وفق النظام الدولي للوحدات (SI)؟', options: ['السعر (cal)', 'السعر الغذائي (Cal)', 'الدرجة المئوية (C)', 'الجول (J)'], correct: 3 },
     { testId: 'test-chem2-mid', question: 'تسمى كمية الحرارة اللازمة لتبخر 1 مول من سائل ما بـ:', options: ['حرارة الانصهار المولارية', 'حرارة التبخر المولارية', 'حرارة الاحتراق', 'حرارة التجمد المولارية'], correct: 1 },
-    // test-chem2-final-theory
     { testId: 'test-chem2-final-theory', question: 'الكتلة المولية لمركب كلوريد الكالسيوم CaCl2 علماً بأن (Ca = 40, Cl = 35.5) تساوي:', options: ['75.5 g/mol', '111 g/mol', '211 g/mol', '311 g/mol'], correct: 1 },
     { testId: 'test-chem2-final-theory', question: 'أول من اقترح فكرة أن المادة تتكون من أجزاء صغيرة جداً غير قابلة للانقسام هو الفيلسوف:', options: ['أرسطو', 'دالتون', 'رذرفورد', 'ديموقريطس'], correct: 3 },
     { testId: 'test-chem2-final-theory', question: 'أي من الإشعاعات الكهروكيميائية/الفيزيائية التالية ساهم اكتشافها في اختراع التلفزيون؟', options: ['أشعة ألفا', 'أشعة بيتا', 'أشعة المهبط', 'المصعد'], correct: 2 },
     { testId: 'test-chem2-final-theory', question: 'إذا كانت قيمة طاقة التنشيط Ea لتفاعل ما عالية جداً، فماذا تتوقع بخصوص سرعة هذا التفاعل؟', options: ['يكون التفاعل سريعاً جداً', 'يكون التفاعل بطيئاً لقلة عدد الاصطدامات الفعالة', 'لا يؤثر ذلك على سرعة التفاعل', 'يكون التفاعل تلقائياً'], correct: 1 },
     { testId: 'test-chem2-final-theory', question: 'في التفاعل المتزن الكيميائي، يزداد انخفاض ذوبانية المادة بسبب تأثير:', options: ['الحاصل الأيوني', 'الأيون المشترك', 'القوى الكهروساتيكية', 'تأثير تندال'], correct: 1 },
     { testId: 'test-chem2-final-theory', question: 'ما حالة الاتزان التي تكون فيها المواد المتفاعلة والناتجة في حالات فيزيائية مختلفة؟', options: ['الاتزان المتجانس', 'الاتزان غير المتجانس', 'الاتزان الديناميكي المفتوح', 'لا يوجد اتزان'], correct: 1 },
-    // test-chem3-practical
     { testId: 'test-chem3-practical', question: 'في تجربة الطلاء بالكهرباء لمفتاح من النحاس، ما القطب الذي يحدث عنده تفاعل الاختزال ويزداد حجمه وكتلته كاثودياً؟', options: ['المصعد (الأنود)', 'المهبط (الكاثود)', 'المحلول الإلكتروليتي', 'القنطرة الملحية'], correct: 1 },
     { testId: 'test-chem3-practical', question: 'ما لون ورقة تباع الشمس الزرقاء عند غمسها في محلول حمضي مثل حمض الهيدروكلوريك HCl؟', options: ['يتحول إلى الأحمر', 'يتحول إلى الأزرق الداكن', 'تظل زرقاء دون تغيير', 'تتحول إلى عديمة اللون'], correct: 0 },
     { testId: 'test-chem3-practical', question: 'ما الصيغة الكيميائية الصحيحة لهيدروكسيد الصوديوم المستخدم كقاعدة قوية في تجارب التعادل؟', options: ['HCl', 'NaCl', 'NaOH', 'H2O'], correct: 2 },
-    // test-chem3-final
     { testId: 'test-chem3-final', question: 'الحركة العشوائية العنيفة لجسيمات المذاب في المخاليط الغروية والتي تمنعها من الترسّب تسمى الحركة:', options: ['الموجية', 'المستقيمة', 'البراونية', 'الدائرية'], correct: 2 },
     { testId: 'test-chem3-final', question: 'تفاعل حمض مع قاعدة لإنتاج ملح وماء يسمى تفاعل:', options: ['التعادل', 'التماثل', 'الأكسدة', 'الاختزال'], correct: 0 },
     { testId: 'test-chem3-final', question: 'إذا كان تركيز أيون الهيدروكسيد [OH-] في محلول مائي يساوي 1.0 × 10^-6 M عند درجة حرارة 298 K، فإن قيم pH و pOH هي:', options: ['pH = 11.6 , pOH = 2.4', 'pH = 4.8 , pOH = 8.2', 'pH = 8.0 , pOH = 6.0', 'pH = 6.0 , pOH = 8.0'], correct: 2 },
     { testId: 'test-chem3-final', question: 'القطب الذي تحدث عنده عملية الأكسدة دائماً في الخلايا الجلفانية الكهروكيميائية هو قطب:', options: ['الكاثود (المهبط)', 'الأنود (المصعد)', 'القنطرة الملحية', 'السلك الخارجي'], correct: 1 }
   ];
 
-  // --- تعريف الإنجازات (القواعد) ---
   const ACHIEVEMENT_DEFS = {
-    'first-lesson': { name: 'أول درس', icon: 'fa-book-open', condition: (user) => user.completedLessons.length >= 1 },
-    'first-test': { name: 'أول اختبار', icon: 'fa-check-circle', condition: (user) => user.testResults.length >= 1 },
-    'points-1000': { name: '⭐ 1000 نقطة', icon: 'fa-star', condition: (user) => user.points >= 1000 },
-    'seven-days': { name: '🔥 7 أيام متتالية', icon: 'fa-fire', condition: (user) => user.streak >= 7 },
-    'five-lessons': { name: '📘 5 دروس مكتملة', icon: 'fa-graduation-cap', condition: (user) => user.completedLessons.length >= 5 },
-    'chem-welcome': { name: '🏅 خطوة أولى في المختبر', icon: 'fa-vial', condition: (user) => user.completedLessons.length >= 1 },
-    'chem-intermediate': { name: '⚛️ مستكشف الذرة والروابط', icon: 'fa-atom', condition: (user) => user.completedLessons.length >= 4 },
-    'chem-master': { name: '🧪 عبقري الكيمياء الشامل', icon: 'fa-flask', condition: (user) => user.completedLessons.length >= 15 },
-    'test-pioneer': { name: '⚡ بطل الاختبارات والتحليلات الكيميائية', icon: 'fa-graduation-cap', condition: (user) => user.testResults.length >= 3 },
-    'streak-hot': { name: '🔥 تفاعل نشط ومستمر لـ 5 أيام متتالية', icon: 'fa-fire', condition: (user) => user.streak >= 5 },
-    'points-elite': { name: '💎 النخبة الكيميائية (1500 نقطة)', icon: 'fa-gem', condition: (user) => user.points >= 1500 }
+    'first-lesson': { name: 'أول درس', icon: 'fa-book-open', condition: (u) => u.completedLessons.length >= 1 },
+    'first-test': { name: 'أول اختبار', icon: 'fa-check-circle', condition: (u) => u.testResults.length >= 1 },
+    'points-1000': { name: '⭐ 1000 نقطة', icon: 'fa-star', condition: (u) => u.points >= 1000 },
+    'seven-days': { name: '🔥 7 أيام متتالية', icon: 'fa-fire', condition: (u) => u.streak >= 7 },
+    'five-lessons': { name: '📘 5 دروس مكتملة', icon: 'fa-graduation-cap', condition: (u) => u.completedLessons.length >= 5 },
+    'chem-welcome': { name: '🏅 خطوة أولى في المختبر', icon: 'fa-vial', condition: (u) => u.completedLessons.length >= 1 },
+    'chem-intermediate': { name: '⚛️ مستكشف الذرة والروابط', icon: 'fa-atom', condition: (u) => u.completedLessons.length >= 4 },
+    'chem-master': { name: '🧪 عبقري الكيمياء الشامل', icon: 'fa-flask', condition: (u) => u.completedLessons.length >= 15 },
+    'test-pioneer': { name: '⚡ بطل الاختبارات والتحليلات الكيميائية', icon: 'fa-graduation-cap', condition: (u) => u.testResults.length >= 3 },
+    'streak-hot': { name: '🔥 تفاعل نشط ومستمر لـ 5 أيام متتالية', icon: 'fa-fire', condition: (u) => u.streak >= 5 },
+    'points-elite': { name: '💎 النخبة الكيميائية (1500 نقطة)', icon: 'fa-gem', condition: (u) => u.points >= 1500 }
   };
 
   // ============================================================
   // 2. إدارة localStorage
   // ============================================================
   const STORAGE_KEY = 'hero_user';
-
   function getDefaultUser() {
-    return {
-      name: '',
-      goal: 90,
-      points: 0,
-      completedLessons: [],
-      testResults: [],
-      achievements: [],
-      streak: 0,
-      lastActive: null,
-    };
+    return { name: '', goal: 90, points: 0, completedLessons: [], testResults: [], achievements: [], streak: 0, lastActive: null };
   }
-
   function loadUser() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const data = JSON.parse(raw);
         const def = getDefaultUser();
-        for (let key in def) {
-          if (!(key in data)) data[key] = def[key];
-        }
+        for (let key in def) if (!(key in data)) data[key] = def[key];
         return data;
       }
-    } catch (e) { console.warn('Error loading user', e); }
+    } catch (e) { console.warn(e); }
     return getDefaultUser();
   }
-
-  function saveUser(user) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-  }
+  function saveUser(user) { localStorage.setItem(STORAGE_KEY, JSON.stringify(user)); }
 
   // ============================================================
-  // 3. الوظائف الأساسية (نفس السابق مع تعديلات بسيطة)
+  // 3. الوظائف الأساسية
   // ============================================================
-
   function getUserStats(user) {
     const total = LESSONS_DATA.length;
     const completed = user.completedLessons.length;
@@ -288,9 +291,7 @@
     for (let sub in map) {
       const scores = map[sub];
       const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
-      if (avg < 70) {
-        weak.push({ subject: sub, score: Math.round(avg) });
-      }
+      if (avg < 70) weak.push({ subject: sub, score: Math.round(avg) });
     }
     weak.sort((a,b) => a.score - b.score);
     return weak;
@@ -299,47 +300,28 @@
   function generateDailyPlan(user) {
     const tasks = [];
     const completedIds = new Set(user.completedLessons);
-    const notCompleted = LESSONS_DATA.filter(lesson => !completedIds.has(lesson.id));
-
+    const notCompleted = LESSONS_DATA.filter(l => !completedIds.has(l.id));
     const weak = getWeakTopics(user);
     if (weak.length > 0) {
       const weakSub = weak[0].subject;
       const found = notCompleted.find(l => l.subject.includes(weakSub));
-      if (found) {
-        tasks.push({ text: `مراجعة ${found.title} (${found.subject})`, time: '30 دقيقة', done: false, icon: 'fa-book' });
-      } else {
-        tasks.push({ text: `مراجعة ${weakSub}`, time: '30 دقيقة', done: false, icon: 'fa-pen' });
-      }
-    } else {
-      if (notCompleted.length > 0) {
-        const l = notCompleted[0];
-        tasks.push({ text: `دراسة ${l.title} (${l.subject})`, time: '45 دقيقة', done: false, icon: 'fa-graduation-cap' });
-      }
+      if (found) tasks.push({ text: `مراجعة ${found.title} (${found.subject})`, time: '30 دقيقة', done: false, icon: 'fa-book' });
+      else tasks.push({ text: `مراجعة ${weakSub}`, time: '30 دقيقة', done: false, icon: 'fa-pen' });
+    } else if (notCompleted.length > 0) {
+      const l = notCompleted[0];
+      tasks.push({ text: `دراسة ${l.title} (${l.subject})`, time: '45 دقيقة', done: false, icon: 'fa-graduation-cap' });
     }
-
     const nextTest = getNextTest(user);
-    if (nextTest) {
-      tasks.push({ text: `مراجعة لـ ${nextTest.title}`, time: '20 دقيقة', done: false, icon: 'fa-clock' });
-    }
-
-    if (tasks.length < 2) {
-      tasks.push({ text: 'حل تمارين عامة', time: '15 دقيقة', done: false, icon: 'fa-puzzle-piece' });
-    }
-
-    if (tasks.length > 0 && user.completedLessons.length > 0) {
-      tasks[0].done = true;
-    }
-
+    if (nextTest) tasks.push({ text: `مراجعة لـ ${nextTest.title}`, time: '20 دقيقة', done: false, icon: 'fa-clock' });
+    if (tasks.length < 2) tasks.push({ text: 'حل تمارين عامة', time: '15 دقيقة', done: false, icon: 'fa-puzzle-piece' });
+    if (tasks.length > 0 && user.completedLessons.length > 0) tasks[0].done = true;
     return tasks;
   }
 
   function getNextTest(user) {
     const solvedIds = new Set(user.testResults.map(r => r.testId));
     const now = new Date();
-    const future = TESTS_DATA
-      .filter(t => !solvedIds.has(t.id))
-      .filter(t => new Date(t.date) >= now)
-      .sort((a,b) => new Date(a.date) - new Date(b.date));
+    const future = TESTS_DATA.filter(t => !solvedIds.has(t.id)).filter(t => new Date(t.date) >= now).sort((a,b) => new Date(a.date) - new Date(b.date));
     return future.length > 0 ? future[0] : null;
   }
 
@@ -347,57 +329,164 @@
     const unlocked = [];
     for (let key in ACHIEVEMENT_DEFS) {
       const def = ACHIEVEMENT_DEFS[key];
-      if (def.condition(user) && !user.achievements.includes(key)) {
-        unlocked.push(key);
-      }
+      if (def.condition(user) && !user.achievements.includes(key)) unlocked.push(key);
     }
-    const all = [...new Set([...user.achievements, ...unlocked])];
-    return all;
+    return [...new Set([...user.achievements, ...unlocked])];
   }
 
   function getRecommendations(user) {
     const recs = [];
     const weak = getWeakTopics(user);
-    if (weak.length > 0) {
-      weak.forEach(w => {
-        if (w.score < 60) {
-          recs.push(`💡 ركز اليوم على "${w.subject}"، نتيجتك الحالية ${w.score}%.`);
-        } else if (w.score < 75) {
-          recs.push(`💡 تحتاج إلى تدريب إضافي في "${w.subject}" (${w.score}%).`);
-        }
-      });
-    }
+    if (weak.length) weak.forEach(w => {
+      if (w.score < 60) recs.push(`💡 ركز اليوم على "${w.subject}"، نتيجتك الحالية ${w.score}%.`);
+      else if (w.score < 75) recs.push(`💡 تحتاج إلى تدريب إضافي في "${w.subject}" (${w.score}%).`);
+    });
     const next = getNextTest(user);
     if (next) {
       const days = Math.ceil((new Date(next.date) - new Date()) / (1000*60*60*24));
-      if (days <= 2) {
-        recs.push(`💡 لديك اختبار "${next.title}" بعد ${days} يوم، ابدأ المراجعة.`);
-      }
+      if (days <= 2) recs.push(`💡 لديك اختبار "${next.title}" بعد ${days} يوم، ابدأ المراجعة.`);
     }
-    if (user.completedLessons.length === 0 && LESSONS_DATA.length > 0) {
-      recs.push('💡 ابدأ بأول درس اليوم لتكسب نقاطاً.');
-    }
-    if (recs.length === 0) {
-      recs.push('💡 أداؤك ممتاز! واصل بنفس الوتيرة.');
-    }
+    if (user.completedLessons.length === 0 && LESSONS_DATA.length) recs.push('💡 ابدأ بأول درس اليوم لتكسب نقاطاً.');
+    if (!recs.length) recs.push('💡 أداؤك ممتاز! واصل بنفس الوتيرة.');
     return recs.slice(0, 3);
   }
 
   // ============================================================
-  // 4. وظيفة عرض الدروس (جديدة)
+  // 4. عرض المودال (عام)
+  // ============================================================
+  function showModal(html) {
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+  // إغلاق المودال عند النقر خارج الصندوق
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ============================================================
+  // 5. عرض الدرس في مودال
+  // ============================================================
+  function openLesson(lessonId) {
+    const lesson = LESSONS_DATA.find(l => l.id === lessonId);
+    if (!lesson) return;
+    const user = loadUser();
+    if (user.completedLessons.includes(lessonId)) {
+      alert('هذا الدرس مكتمل بالفعل!');
+      return;
+    }
+    const html = `
+      <h2>${lesson.title}</h2>
+      <div class="sub">${lesson.subject} • ${lesson.difficulty === 'easy' ? 'سهل' : lesson.difficulty === 'medium' ? 'متوسط' : 'صعب'}</div>
+      <div class="content">${lesson.content || 'لا يوجد محتوى لهذا الدرس حالياً.'}</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">رجوع</button>
+        <button class="btn btn-success" onclick="completeLessonFromModal('${lessonId}')"><i class="fas fa-check"></i> إنهاء الدرس</button>
+      </div>
+    `;
+    showModal(html);
+  }
+
+  function completeLessonFromModal(lessonId) {
+    const user = loadUser();
+    if (user.completedLessons.includes(lessonId)) { closeModal(); return; }
+    user.completedLessons.push(lessonId);
+    user.points = (user.points || 0) + 10;
+    user.streak = (user.streak || 0) + 1;
+    saveUser(user);
+    closeModal();
+    renderDashboard();
+    alert(`✅ تم إكمال درس "${LESSONS_DATA.find(l => l.id === lessonId)?.title}" بنجاح!`);
+  }
+
+  // ============================================================
+  // 6. عرض الاختبار في مودال
+  // ============================================================
+  function startQuiz(testId) {
+    const questions = QUESTIONS_DATA.filter(q => q.testId === testId);
+    if (!questions.length) {
+      alert('لا توجد أسئلة لهذا الاختبار حالياً.');
+      return;
+    }
+    const test = TESTS_DATA.find(t => t.id === testId);
+    // بناء الأسئلة
+    let html = `<h2>${test.title}</h2><div class="sub">عدد الأسئلة: ${questions.length}</div><form id="quizForm">`;
+    questions.forEach((q, idx) => {
+      const optionsHtml = q.options.map((opt, oi) => `
+        <label class="option">
+          <input type="radio" name="q${idx}" value="${oi}" required />
+          ${opt}
+        </label>
+      `).join('');
+      html += `
+        <div class="question-item">
+          <div class="q-text">${idx+1}. ${q.question}</div>
+          ${optionsHtml}
+        </div>
+      `;
+    });
+    html += `
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> إرسال الإجابات</button>
+      </div>
+    </form>
+    <div id="quizResult"></div>
+    `;
+    showModal(html);
+
+    // معالجة الإرسال
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      let correct = 0;
+      questions.forEach((q, idx) => {
+        const selected = formData.get(`q${idx}`);
+        if (selected !== null && parseInt(selected) === q.correct) correct++;
+      });
+      const total = questions.length;
+      const percentage = Math.round((correct / total) * 100);
+      // تخزين النتيجة
+      const user = loadUser();
+      // تجنب تكرار النتيجة إذا كانت موجودة
+      if (!user.testResults.find(r => r.testId === testId)) {
+        user.testResults.push({ testId: testId, score: percentage });
+        // إضافة نقاط عن الاختبار
+        user.points = (user.points || 0) + 20;
+        saveUser(user);
+      } else {
+        // تحديث النتيجة إذا كانت موجودة (يمكن تعديلها)
+        const existing = user.testResults.find(r => r.testId === testId);
+        if (existing) existing.score = percentage;
+        saveUser(user);
+      }
+      // عرض النتيجة في المودال
+      const resultDiv = document.getElementById('quizResult');
+      resultDiv.innerHTML = `
+        <div class="result-box">
+          <div class="score-big">${percentage}%</div>
+          <div>الإجابات الصحيحة: ${correct} من ${total}</div>
+          <button class="btn btn-success" onclick="closeModal(); renderDashboard();" style="margin-top:10px;">عرض التقدم</button>
+        </div>
+      `;
+      document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
+      renderDashboard(); // تحديث فوري للواجهة
+    });
+  }
+
+  // ============================================================
+  // 7. عرض قائمة الدروس (واجهة)
   // ============================================================
   function renderLessonsList() {
     const user = loadUser();
     const container = document.getElementById('lessonsListContainer');
-    const countSpan = document.getElementById('lessonsCount');
-    const total = LESSONS_DATA.length;
-    countSpan.textContent = total;
-
-    if (total === 0) {
+    document.getElementById('lessonsCount').textContent = LESSONS_DATA.length;
+    if (!LESSONS_DATA.length) {
       container.innerHTML = `<div class="text-muted">لا توجد دروس حالياً</div>`;
       return;
     }
-
     const completedIds = new Set(user.completedLessons);
     let html = '';
     LESSONS_DATA.forEach(lesson => {
@@ -409,7 +498,7 @@
             <div class="subject">${lesson.subject} • ${lesson.difficulty === 'easy' ? 'سهل' : lesson.difficulty === 'medium' ? 'متوسط' : 'صعب'}</div>
           </div>
           <div class="actions">
-            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : `<button class="btn-start" onclick="completeLesson('${lesson.id}')">بدء الدراسة</button>`}
+            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : `<button class="btn-start" onclick="openLesson('${lesson.id}')">بدء الدراسة</button>`}
           </div>
         </div>
       `;
@@ -418,39 +507,11 @@
   }
 
   // ============================================================
-  // 5. دالة إكمال الدرس (جديدة)
+  // 8. تحديث لوحة التحكم
   // ============================================================
-  function completeLesson(lessonId) {
-    const user = loadUser();
-    if (user.completedLessons.includes(lessonId)) {
-      alert('هذا الدرس مكتمل بالفعل!');
-      return;
-    }
-    // إضافة الدرس إلى المكتملين
-    user.completedLessons.push(lessonId);
-    // إضافة نقاط (مثلاً 10 نقاط لكل درس)
-    user.points = (user.points || 0) + 10;
-    // تحديث streak (محاكاة)
-    user.streak = (user.streak || 0) + 1;
-    saveUser(user);
-    // إعادة رسم الواجهة
-    renderDashboard();
-    renderLessonsList();
-    alert(`✅ تم إكمال درس "${LESSONS_DATA.find(l => l.id === lessonId)?.title}" بنجاح!`);
-  }
-
-  // ============================================================
-  // 6. تحديث واجهة المستخدم (نفس السابق مع إضافة عرض الدروس)
-  // ============================================================
-
   function renderDashboard() {
     const user = loadUser();
-    const nameSpan = document.getElementById('userName');
-    if (user.name && user.name.trim() !== '') {
-      nameSpan.textContent = user.name;
-    } else {
-      nameSpan.textContent = '(اضغط لتحديد اسمك)';
-    }
+    document.getElementById('userName').textContent = user.name || '(اضغط لتحديد اسمك)';
     document.getElementById('userPoints').textContent = user.points || 0;
 
     const stats = getUserStats(user);
@@ -460,36 +521,20 @@
     document.getElementById('completedLessons').textContent = stats.completed;
     document.getElementById('totalLessons').textContent = stats.total;
 
-    // الخطة اليومية
+    // الخطة
     const plan = generateDailyPlan(user);
-    const planContainer = document.getElementById('dailyPlanContainer');
-    if (plan.length === 0) {
-      planContainer.innerHTML = `<div class="text-muted">لا توجد مهام حالياً</div>`;
-    } else {
-      planContainer.innerHTML = plan.map((task) => `
-        <div class="task-item">
-          <div class="left">
-            <i class="fas ${task.icon} ${task.done ? 'done' : 'pending'}"></i>
-            <span style="${task.done ? 'text-decoration:line-through; color:#8a9bb5;' : ''}">${task.text}</span>
-          </div>
-          <span class="time">${task.time}</span>
-        </div>
-      `).join('');
-    }
+    document.getElementById('dailyPlanContainer').innerHTML = plan.length ? plan.map(t => `
+      <div class="task-item">
+        <div class="left"><i class="fas ${t.icon} ${t.done ? 'done' : 'pending'}"></i><span style="${t.done ? 'text-decoration:line-through; color:#8a9bb5;' : ''}">${t.text}</span></div>
+        <span class="time">${t.time}</span>
+      </div>
+    `).join('') : '<div class="text-muted">لا توجد مهام حالياً</div>';
 
     // نقاط الضعف
     const weak = getWeakTopics(user);
-    const weakContainer = document.getElementById('weakTopicsContainer');
-    if (weak.length === 0) {
-      weakContainer.innerHTML = `<div class="text-muted">🎉 لا توجد نقاط ضعف، أداؤك جيد!</div>`;
-    } else {
-      weakContainer.innerHTML = weak.map(w => `
-        <div class="weak-topic">
-          <span>${w.subject}</span>
-          <span class="score ${w.score < 60 ? 'low' : 'mid'}">${w.score}%</span>
-        </div>
-      `).join('');
-    }
+    document.getElementById('weakTopicsContainer').innerHTML = weak.length ? weak.map(w => `
+      <div class="weak-topic"><span>${w.subject}</span><span class="score ${w.score < 60 ? 'low' : 'mid'}">${w.score}%</span></div>
+    `).join('') : '<div class="text-muted">🎉 لا توجد نقاط ضعف، أداؤك جيد!</div>';
 
     // الاختبار القادم
     const nextTest = getNextTest(user);
@@ -498,16 +543,13 @@
       const days = Math.ceil((new Date(nextTest.date) - new Date()) / (1000*60*60*24));
       testContainer.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <strong>${nextTest.title}</strong>
-            <div class="text-muted" style="font-size:13px;">${days > 0 ? `بعد ${days} يوم` : 'اليوم'}</div>
-          </div>
+          <div><strong>${nextTest.title}</strong><div class="text-muted" style="font-size:13px;">${days > 0 ? `بعد ${days} يوم` : 'اليوم'}</div></div>
           <span class="badge">${nextTest.duration} دقيقة</span>
         </div>
         <div style="margin-top:8px;"><button class="btn" onclick="event.stopPropagation(); startQuiz('${nextTest.id}')" style="padding:6px 16px;font-size:13px;">ابدأ الاختبار</button></div>
       `;
     } else {
-      testContainer.innerHTML = `<div class="text-muted">✅ لا توجد اختبارات قادمة</div>`;
+      testContainer.innerHTML = '<div class="text-muted">✅ لا توجد اختبارات قادمة</div>';
     }
 
     // الإنجازات
@@ -516,54 +558,32 @@
       user.achievements = allAchievements;
       saveUser(user);
     }
-    const achContainer = document.getElementById('achievementsContainer');
-    if (allAchievements.length === 0) {
-      achContainer.innerHTML = `<span class="text-muted">لا توجد إنجازات بعد</span>`;
-    } else {
-      achContainer.innerHTML = allAchievements.map(key => {
-        const def = ACHIEVEMENT_DEFS[key];
-        if (!def) return '';
-        return `<span class="achievement-badge"><i class="fas ${def.icon}"></i> ${def.name}</span>`;
-      }).join('');
-    }
+    document.getElementById('achievementsContainer').innerHTML = allAchievements.length ? allAchievements.map(key => {
+      const def = ACHIEVEMENT_DEFS[key];
+      return def ? `<span class="achievement-badge"><i class="fas ${def.icon}"></i> ${def.name}</span>` : '';
+    }).join('') : '<span class="text-muted">لا توجد إنجازات بعد</span>';
 
     // التوصيات
     const recs = getRecommendations(user);
-    const recContainer = document.getElementById('recommendationsContainer');
-    if (recs.length === 0) {
-      recContainer.innerHTML = `<div class="text-muted">لا توجد توصيات خاصة</div>`;
-    } else {
-      recContainer.innerHTML = recs.map(r => `<div class="recommend"><i class="fas fa-lightbulb"></i> ${r}</div>`).join('');
-    }
+    document.getElementById('recommendationsContainer').innerHTML = recs.length ? recs.map(r => `<div class="recommend"><i class="fas fa-lightbulb"></i> ${r}</div>`).join('') : '<div class="text-muted">لا توجد توصيات خاصة</div>';
 
-    // تحديث قائمة الدروس (استدعاء جديد)
+    // قائمة الدروس
     renderLessonsList();
   }
 
   // ============================================================
-  // 7. وظيفة تغيير الاسم
+  // 9. وظائف أخرى
   // ============================================================
   function changeName() {
     const user = loadUser();
-    const currentName = user.name || '';
-    const newName = prompt('أدخل اسمك ليظهر في لوحة التحكم:', currentName);
+    const newName = prompt('أدخل اسمك:', user.name || '');
     if (newName !== null) {
       const trimmed = newName.trim();
-      if (trimmed !== '') {
-        user.name = trimmed;
-        saveUser(user);
-        renderDashboard();
-      } else if (trimmed === '' && currentName !== '') {
-        user.name = '';
-        saveUser(user);
-        renderDashboard();
-      }
+      user.name = trimmed || '';
+      saveUser(user);
+      renderDashboard();
     }
   }
-
-  // ============================================================
-  // 8. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
-  // ============================================================
 
   function resetProgress() {
     if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
@@ -575,24 +595,21 @@
     }
   }
 
-  // تحسين دالة addSampleData لتضيف دروساً نموذجية مع نقاط
   function addSampleData() {
     const user = loadUser();
-    // إضافة 5 دروس نموذجية (أول 5 دروس في القائمة)
-    const sampleLessonIds = LESSONS_DATA.slice(0, 5).map(l => l.id);
+    const sampleIds = LESSONS_DATA.slice(0, 5).map(l => l.id);
     let added = 0;
-    sampleLessonIds.forEach(id => {
+    sampleIds.forEach(id => {
       if (!user.completedLessons.includes(id)) {
         user.completedLessons.push(id);
         user.points = (user.points || 0) + 10;
         added++;
       }
     });
-    // إضافة نتائج اختبارات نموذجية
     const sampleResults = [
       { testId: 'math-test-01', score: 55 },
       { testId: 'arabic-test-01', score: 62 },
-      { testId: 'physics-test-01', score: 88 },
+      { testId: 'physics-test-01', score: 88 }
     ];
     sampleResults.forEach(sr => {
       if (!user.testResults.find(r => r.testId === sr.testId)) {
@@ -605,36 +622,18 @@
     alert(`تمت إضافة ${added} دروس نموذجية!`);
   }
 
-  // دالة بدء الاختبار (مؤقتة)
-  function startQuiz(testId) {
-    const questions = QUESTIONS_DATA.filter(q => q.testId === testId);
-    if (questions.length === 0) {
-      alert('لا توجد أسئلة لهذا الاختبار حالياً.');
-      return;
-    }
-    // هنا يمكنك تنفيذ واجهة اختبار كاملة، حالياً نعرض تنبيه
-    alert(`سيبدأ الاختبار: ${TESTS_DATA.find(t => t.id === testId)?.title}\nعدد الأسئلة: ${questions.length}`);
-    // يمكنك تطويرها لاحقاً لعرض أسئلة وإجابة وحساب النتيجة
-  }
-
   function goTo(section) {
     alert(`سيتم الانتقال إلى صفحة: ${section} (يمكنك تنفيذها لاحقاً)`);
   }
 
   // ============================================================
-  // 9. التشغيل الأولي
+  // 10. التشغيل الأولي
   // ============================================================
-
   if (!localStorage.getItem(STORAGE_KEY)) {
     const def = getDefaultUser();
     def.name = '';
-    def.points = 0;
-    def.completedLessons = [];
-    def.testResults = [];
-    def.streak = 0;
     saveUser(def);
   }
-
   renderDashboard();
 </script>
 </body>
