@@ -14,13 +14,13 @@ function renderAnalysis() {
       </div>
       <div class="card">
         <div class="card-title">نقاط القوة 💪</div>
-        <div>${strengths.length ? strengths.slice(0,3).map(s => 
+        <div>${strengths.length ? strengths.slice(0, 3).map(s =>
           `<div class="skill-item"><span>${s.subject}</span><span style="font-weight:600; color:#34c759;">${s.score}%</span></div>`
         ).join('') : '<div class="text-muted">لا توجد بيانات كافية</div>'}</div>
       </div>
       <div class="card">
         <div class="card-title">تحتاج إلى تطوير 🔥</div>
-        <div>${weak.length ? weak.slice(0,3).map(w => 
+        <div>${weak.length ? weak.slice(0, 3).map(w =>
           `<div class="skill-item"><span>${w.subject}</span><span style="font-weight:600; color:#ff3b30;">${w.score}%</span></div>`
         ).join('') : '<div class="text-muted">🎉 لا توجد نقاط ضعف ملحوظة</div>'}</div>
       </div>
