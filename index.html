@@ -5,68 +5,625 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مساعد النجاح</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+    body { background:#f4f7fc; display:flex; justify-content:center; min-height:100vh; padding-bottom:70px; }
+    .app { max-width:480px; width:100%; background:white; min-height:100vh; padding:16px 16px 80px; box-shadow:0 0 20px rgba(0,0,0,0.05); position:relative; }
+    .app-header { display:flex; justify-content:space-between; align-items:center; padding:8px 0 16px; border-bottom:1px solid #e9edf4; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+    .header-title { font-size:22px; font-weight:700; color:#1a2b4a; }
+    .user-info { background:#eef2f9; border-radius:40px; padding:6px 14px; font-size:13px; font-weight:600; color:#1a2b4a; display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .user-info i { color:#5b7cfa; }
+    .stage-badge { background:#5b7cfa; color:white; padding:1px 10px; border-radius:20px; font-size:11px; }
+    .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:white; border-top:1px solid #e9edf4; display:flex; justify-content:space-around; padding:8px 0 12px; z-index:100; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; font-size:11px; color:#8a9bb5; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:12px; transition:0.2s; }
+    .nav-item i { font-size:20px; margin-bottom:2px; }
+    .nav-item.active { color:#5b7cfa; font-weight:600; }
+    .nav-item.active i { color:#5b7cfa; }
+    .page { display:none; animation:fade 0.3s ease; }
+    .page.active { display:block; }
+    @keyframes fade { from{opacity:0.5; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+    .card { background:#ffffff; border-radius:20px; padding:16px 14px; margin-bottom:14px; border:1px solid #e9edf4; box-shadow:0 2px 8px rgba(0,0,0,0.02); }
+    .card-title { font-weight:700; font-size:15px; color:#1a2b4a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+    .card-title i { color:#5b7cfa; margin-left:8px; }
+    .badge { background:#eef2f9; border-radius:30px; padding:2px 12px; font-size:11px; font-weight:500; color:#3a4b6a; }
+    .progress-bar { width:100%; height:8px; background:#e9edf4; border-radius:20px; margin:6px 0; }
+    .progress-bar .fill { height:100%; border-radius:20px; background:linear-gradient(90deg,#5b7cfa,#8aa3ff); width:0%; }
+    .flex-row { display:flex; justify-content:space-between; align-items:center; }
+    .text-muted { color:#8a9bb5; font-size:13px; }
+    .btn { background:#5b7cfa; color:white; border:none; padding:8px 16px; border-radius:40px; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:6px; }
+    .btn:active { transform:scale(0.95); }
+    .btn-outline { background:transparent; border:1px solid #5b7cfa; color:#5b7cfa; }
+    .btn-success { background:#34c759; }
+    .btn-sm { padding:5px 12px; font-size:12px; }
+    .mt-2 { margin-top:10px; }
+    .lesson-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f4f8; }
+    .lesson-item:last-child { border-bottom:none; }
+    .lesson-item .info { display:flex; flex-direction:column; gap:2px; }
+    .lesson-item .info .title { font-weight:600; color:#1a2b4a; font-size:14px; }
+    .lesson-item .info .sub { font-size:12px; color:#8a9bb5; }
+    .completed-badge { background:#e0f2e0; color:#1a7a3a; padding:3px 10px; border-radius:30px; font-size:11px; font-weight:600; }
+    .category-tabs { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .category-tab { padding:4px 14px; border-radius:30px; border:2px solid #e9edf4; background:white; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s; }
+    .category-tab.active { border-color:#5b7cfa; background:#e0e8ff; }
+    .subject-tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+    .subject-tab { padding:3px 12px; border-radius:30px; border:1px solid #e9edf4; background:white; font-size:12px; cursor:pointer; transition:0.2s; }
+    .subject-tab.active { border-color:#5b7cfa; background:#eef2f9; }
+    .test-card { background:#f8faff; border-radius:14px; padding:10px 12px; margin-bottom:8px; border-right:3px solid #5b7cfa; }
+    .test-card .title { font-weight:600; font-size:14px; }
+    .test-card .meta { font-size:12px; color:#3a4b6a; }
+    .skill-item { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
+    .skill-item .bar { flex:1; height:5px; background:#e9edf4; border-radius:20px; margin:0 10px; }
+    .skill-item .bar .fill { height:100%; border-radius:20px; }
+    .skill-item .bar .fill.low { background:#ff3b30; }
+    .skill-item .bar .fill.mid { background:#ff9500; }
+    .skill-item .bar .fill.high { background:#34c759; }
+    .plan-day { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f0f4f8; }
+    .plan-day .day { font-weight:600; width:60px; font-size:13px; }
+    .plan-day .task { flex:1; font-size:13px; }
+    .plan-day .status { font-size:16px; cursor:pointer; }
+    .plan-day .status.done { color:#34c759; }
+    .plan-day .status.pending { color:#ff9500; }
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:1000; padding:16px; }
+    .modal-overlay.active { display:flex; }
+    .modal-box { background:white; max-width:700px; width:100%; max-height:90vh; height:auto; border-radius:32px; padding:32px; box-shadow:0 30px 80px rgba(0,0,0,0.3); overflow-y:auto; animation:modalFadeIn 0.3s ease; }
+    @keyframes modalFadeIn { from{opacity:0; transform:scale(0.95) translateY(20px);} to{opacity:1; transform:scale(1) translateY(0);} }
+    .lesson-content { line-height:1.9; font-size:16px; color:#1a2b4a; }
+    .lesson-content h1 { font-size:26px; margin:20px 0 12px; color:#1a2b4a; }
+    .lesson-content h2 { font-size:22px; margin:18px 0 10px; color:#2c3e6a; }
+    .lesson-content h3 { font-size:18px; margin:14px 0 8px; color:#3a4b6a; }
+    .lesson-content p { margin:10px 0; }
+    .lesson-content ul, .lesson-content ol { margin:10px 0 10px 20px; }
+    .lesson-content li { margin:4px 0; }
+    .lesson-content img { max-width:100%; border-radius:16px; margin:12px 0; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    .lesson-content iframe { width:100%; aspect-ratio:16/9; border-radius:16px; margin:12px 0; border:none; }
+    .lesson-content table { width:100%; border-collapse:collapse; margin:12px 0; }
+    .lesson-content th, .lesson-content td { border:1px solid #e9edf4; padding:8px 12px; text-align:right; }
+    .lesson-content th { background:#f0f4fe; font-weight:600; }
+    .lesson-content .highlight-box { background:#f8faff; padding:16px; border-radius:16px; border-right:4px solid #5b7cfa; margin:12px 0; }
+    .lesson-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f0f4f8; }
+    .lesson-header h2 { font-size:26px; color:#1a2b4a; margin:0; }
+    .lesson-header .meta { font-size:14px; color:#8a9bb5; }
+    .modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:24px; padding-top:16px; border-top:1px solid #f0f4f8; }
+    .stage-options { display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+    .stage-options button { flex:1; padding:10px; border-radius:12px; border:2px solid #e9edf4; background:white; font-weight:600; font-size:16px; cursor:pointer; transition:0.2s; min-width:70px; }
+    .stage-options button.active { border-color:#5b7cfa; background:#e0e8ff; }
+    .btn-start-app { width:100%; padding:12px; margin-top:16px; font-size:18px; justify-content:center; }
+    .footer-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .footer-actions .btn { flex:1; justify-content:center; }
+    .text-center { text-align:center; }
+    .option { display:block; padding:8px 12px; margin:4px 0; background:white; border-radius:10px; border:1px solid #e9edf4; cursor:pointer; transition:0.2s; }
+    .option:hover { background:#eef2f9; }
+    .option input[type="radio"] { margin-left:10px; }
+    .result-box { background:#e0f2e0; padding:16px; border-radius:16px; text-align:center; margin-top:10px; }
+    .result-box .score-big { font-size:32px; font-weight:700; color:#1a2b4a; }
+  </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <!-- الرأس العلوي -->
-    <header class="app-header" id="appHeader">
-      <div class="header-title">مساعد النجاح</div>
-      <div class="user-info" onclick="editProfile()">
-        <i class="fas fa-user-graduate"></i>
-        <span id="userNameDisplay">طالب</span>
-        <span id="userStageDisplay" class="stage-badge"></span>
-        <span id="userPointsDisplay">0</span>
-      </div>
-    </header>
-
-    <!-- حاوية الصفحات -->
-    <main id="page-container">
-      <!-- يتم تحميل الصفحات عبر JavaScript -->
-    </main>
-
-    <!-- شريط التنقل السفلي -->
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-page="home"><i class="fas fa-home"></i> الرئيسية</button>
-      <button class="nav-item" data-page="train"><i class="fas fa-dumbbell"></i> تدرب</button>
-      <button class="nav-item" data-page="test"><i class="fas fa-pencil-alt"></i> اختبار</button>
-      <button class="nav-item" data-page="analysis"><i class="fas fa-chart-pie"></i> تحليلي</button>
-      <button class="nav-item" data-page="plan"><i class="fas fa-calendar-check"></i> خطتي</button>
-    </nav>
-  </div>
-
-  <!-- مودال الترحيب (يظهر لأول مرة) -->
-  <div class="modal-overlay" id="welcomeModal">
-    <div class="modal-box">
-      <h2 id="welcomeTitle">مرحباً بك في مساعد النجاح</h2>
-      <p id="welcomeSub">أخبرنا عن نفسك لنخصص لك التجربة</p>
-      <label>الاسم</label>
-      <input type="text" id="inputName" placeholder="اكتب اسمك" />
-      <label>المرحلة الدراسية</label>
-      <div class="stage-options" id="stageOptions">
-        <button data-stage="ابتدائي">ابتدائي</button>
-        <button data-stage="اعدادي">اعدادي</button>
-        <button data-stage="ثانوي" class="active">ثانوي</button>
-      </div>
-      <button class="btn btn-start-app" id="startAppBtn">ابدأ الرحلة</button>
+<div class="app" id="app">
+  <header class="app-header">
+    <div class="header-title">مساعد النجاح</div>
+    <div class="user-info" onclick="editProfile()">
+      <i class="fas fa-user-graduate"></i>
+      <span id="userNameDisplay">طالب</span>
+      <span id="userStageDisplay" class="stage-badge"></span>
+      <span id="userPointsDisplay">0</span>
     </div>
+  </header>
+  <main id="page-container"></main>
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home"><i class="fas fa-home"></i> الرئيسية</button>
+    <button class="nav-item" data-page="train"><i class="fas fa-dumbbell"></i> تدرب</button>
+    <button class="nav-item" data-page="test"><i class="fas fa-pencil-alt"></i> اختبار</button>
+    <button class="nav-item" data-page="analysis"><i class="fas fa-chart-pie"></i> تحليلي</button>
+    <button class="nav-item" data-page="plan"><i class="fas fa-calendar-check"></i> خطتي</button>
+  </nav>
+  <div class="footer-actions">
+    <button class="btn btn-outline" onclick="resetProgress()"><i class="fas fa-undo"></i> إعادة تعيين</button>
+    <button class="btn" onclick="addSampleData()"><i class="fas fa-plus"></i> بيانات نموذجية</button>
   </div>
+</div>
 
-  <!-- مودال عرض المحتوى (درس / اختبار) -->
-  <div class="modal-overlay" id="contentModal">
-    <div class="modal-box" id="contentModalBox">
-      <div id="contentModalBody"></div>
+<!-- مودال الترحيب -->
+<div class="modal-overlay" id="welcomeModal">
+  <div class="modal-box">
+    <h2 id="welcomeTitle">مرحباً بك في مساعد النجاح</h2>
+    <p id="welcomeSub">أخبرنا عن نفسك لنخصص لك التجربة</p>
+    <label>الاسم</label>
+    <input type="text" id="inputName" placeholder="اكتب اسمك" />
+    <label>المرحلة الدراسية</label>
+    <div class="stage-options" id="stageOptions">
+      <button data-stage="ابتدائي">ابتدائي</button>
+      <button data-stage="اعدادي">اعدادي</button>
+      <button data-stage="ثانوي" class="active">ثانوي</button>
     </div>
+    <button class="btn btn-start-app" id="startAppBtn">ابدأ الرحلة</button>
   </div>
+</div>
 
-  <!-- تحميل الجافاسكريبت (الملفات منفصلة) -->
-  <script src="js/storage.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/pages/home.js"></script>
-  <script src="js/pages/train.js"></script>
-  <script src="js/pages/test.js"></script>
-  <script src="js/pages/analysis.js"></script>
-  <script src="js/pages/plan.js"></script>
-  <script src="js/app.js"></script>
+<!-- مودال عرض المحتوى -->
+<div class="modal-overlay" id="contentModal">
+  <div class="modal-box" id="contentModalBox">
+    <div id="contentModalBody"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// 1. البيانات المضمنة (عدّل هنا لإضافة دروس أو اختبارات جديدة)
+// ================================================================
+const SUBJECTS = [
+  { "id": "math", "name": "رياضيات", "stage": "ابتدائي" },
+  { "id": "arabic", "name": "لغة عربية", "stage": "ابتدائي" },
+  { "id": "science", "name": "علوم", "stage": "ابتدائي" },
+  { "id": "math-prep", "name": "رياضيات", "stage": "اعدادي" },
+  { "id": "physics-prep", "name": "فيزياء", "stage": "اعدادي" },
+  { "id": "chem-prep", "name": "كيمياء", "stage": "اعدادي" },
+  { "id": "verbal", "name": "لفظي", "stage": "ثانوي", "category": "قدرات" },
+  { "id": "quant", "name": "كمي", "stage": "ثانوي", "category": "قدرات" },
+  { "id": "math-sec", "name": "رياضيات", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "physics-sec", "name": "فيزياء", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "chemistry-sec", "name": "كيمياء", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "biology-sec", "name": "أحياء", "stage": "ثانوي", "category": "تحصيلي" }
+];
+
+const LESSONS = [
+  { "id": "p-math-1", "stage": "ابتدائي", "subjectId": "math", "title": "الأعداد من 1 إلى 100", "difficulty": "easy", "content": "<h2>الأعداد من 1 إلى 100</h2><p>تعلم الأعداد من 1 إلى 100 مع تمارين تفاعلية.</p><ul><li>العد من 1 إلى 10</li><li>العد من 10 إلى 20</li><li>العد من 20 إلى 100</li></ul><div class='highlight-box'><strong>💡 نصيحة:</strong> راجع الأعداد يومياً حتى تتقنها.</div>" },
+  { "id": "p-math-2", "stage": "ابتدائي", "subjectId": "math", "title": "الجمع والطرح", "difficulty": "easy", "content": "<h2>الجمع والطرح</h2><p>تعلم أساسيات الجمع والطرح.</p><table><tr><th>العملية</th><th>مثال</th></tr><tr><td>الجمع</td><td>5 + 3 = 8</td></tr><tr><td>الطرح</td><td>10 - 4 = 6</td></tr></table>" },
+  { "id": "p-arabic-1", "stage": "ابتدائي", "subjectId": "arabic", "title": "الحروف الهجائية", "difficulty": "easy", "content": "<h2>الحروف الهجائية</h2><p>تعلم الحروف الأبجدية مع أمثلة.</p><ul><li>أ: أرنب</li><li>ب: باب</li><li>ت: تفاح</li></ul>" },
+  { "id": "p-science-1", "stage": "ابتدائي", "subjectId": "science", "title": "النباتات والحيوانات", "difficulty": "easy", "content": "<h2>النباتات والحيوانات</h2><p>تصنيف الكائنات الحية.</p><ul><li>نباتات: تنتج غذائها بنفسها</li><li>حيوانات: تتغذى على غيرها</li></ul>" },
+  { "id": "m-math-1", "stage": "اعدادي", "subjectId": "math-prep", "title": "النسبة والتناسب", "difficulty": "medium", "content": "<h2>النسبة والتناسب</h2><p>تعلم النسبة والتناسب مع أمثلة.</p><div class='highlight-box'><strong>مثال:</strong> إذا كانت النسبة 2:3، فالنسبة المكافئة هي 4:6.</div>" },
+  { "id": "m-math-2", "stage": "اعدادي", "subjectId": "math-prep", "title": "المعادلات الخطية", "difficulty": "medium", "content": "<h2>المعادلات الخطية</h2><p>حل المعادلات من الدرجة الأولى.</p><p><strong>مثال:</strong> 2س + 3 = 7 → 2س = 4 → س = 2</p>" },
+  { "id": "m-physics-1", "stage": "اعدادي", "subjectId": "physics-prep", "title": "الحركة والسرعة", "difficulty": "medium", "content": "<h2>الحركة والسرعة</h2><p>مفاهيم الحركة والسرعة والتسارع.</p><ul><li>السرعة: المسافة / الزمن</li><li>التسارع: التغير في السرعة / الزمن</li></ul>" },
+  { "id": "m-chem-1", "stage": "اعدادي", "subjectId": "chem-prep", "title": "المادة وخواصها", "difficulty": "easy", "content": "<h2>المادة وخواصها</h2><p>تعريف المادة وخواصها الفيزيائية والكيميائية.</p><ul><li>خواص فيزيائية: اللون، الكتلة، الحجم</li><li>خواص كيميائية: التفاعل مع المواد الأخرى</li></ul>" },
+  { "id": "s-verbal-1", "stage": "ثانوي", "subjectId": "verbal", "title": "استيعاب المقروء - المستوى 1", "difficulty": "easy", "content": "<h2>استيعاب المقروء</h2><p>تدريبات على فهم النصوص.</p><div class='highlight-box'><strong>نص:</strong> القراءة مفتاح العلم. <br>السؤال: مفتاح العلم هو؟<br>الإجابة: القراءة.</div>" },
+  { "id": "s-verbal-2", "stage": "ثانوي", "subjectId": "verbal", "title": "إكمال الجمل - المستوى 2", "difficulty": "medium", "content": "<h2>إكمال الجمل</h2><p>تدريبات على إكمال الجمل.</p><p><strong>مثال:</strong> الشمس تشرق من ________. (الشرق)</p>" },
+  { "id": "s-quant-1", "stage": "ثانوي", "subjectId": "quant", "title": "الحساب الأساسي", "difficulty": "easy", "content": "<h2>الحساب الأساسي</h2><p>مراجعة العمليات الحسابية.</p><ul><li>الجمع: 12 + 8 = 20</li><li>الطرح: 25 - 10 = 15</li><li>الضرب: 6 × 7 = 42</li></ul>" },
+  { "id": "s-quant-2", "stage": "ثانوي", "subjectId": "quant", "title": "النسب والتناسب - كمي", "difficulty": "medium", "content": "<h2>النسب والتناسب (كمي)</h2><p>تدريبات على النسب والتناسب.</p><p>مثال: إذا كان 3 س = 9، فما قيمة س؟ (س = 3)</p>" },
+  { "id": "s-math-1", "stage": "ثانوي", "subjectId": "math-sec", "title": "التفاضل - المستوى 1", "difficulty": "medium", "content": "<h2>التفاضل</h2><p>مشتقات الدوال الأساسية.</p><p><strong>مثال:</strong> مشتقة س² هي 2س.</p><p>مشتقة 3س² + 2س هي 6س + 2.</p>" },
+  { "id": "s-phys-1", "stage": "ثانوي", "subjectId": "physics-sec", "title": "القوانين الأساسية في الحركة", "difficulty": "medium", "content": "<h2>قوانين نيوتن للحركة</h2><p>القانون الأول: الجسم الساكن يبقى ساكناً ما لم تؤثر عليه قوة.</p><p>القانون الثاني: القوة = الكتلة × التسارع.</p><p>القانون الثالث: لكل فعل رد فعل مساوٍ له في المقدار ومعاكس في الاتجاه.</p>" },
+  { "id": "chem1-intro", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "مقدمة في علم الكيمياء", "difficulty": "easy", "content": "<h2>مقدمة في علم الكيمياء</h2><p>الكيمياء هي علم المادة وتفاعلاتها.</p><ul><li>المادة: كل ما له كتلة ويشغل حيزاً</li><li>التفاعل الكيميائي: تحول المواد المتفاعلة إلى ناتجة</li></ul>" },
+  { "id": "chem1-matter", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "المادة: الخواص والتغيرات", "difficulty": "easy", "content": "<h2>المادة وخواصها</h2><p>المادة لها خواص فيزيائية وكيميائية.</p><ul><li>الخواص الفيزيائية: اللون، الكثافة، نقطة الغليان</li><li>الخواص الكيميائية: التفاعل مع الأكسجين، الحموضة</li></ul>" },
+  { "id": "chem1-atom", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "تركيب الذرة والتوزيع الإلكتروني", "difficulty": "medium", "content": "<h2>تركيب الذرة</h2><p>الذرة تتكون من:</p><ul><li>بروتونات (شحنة موجبة) في النواة</li><li>نيوترونات (متعدلة) في النواة</li><li>إلكترونات (شحنة سالبة) تدور حول النواة</li></ul><div class='highlight-box'><strong>مثال:</strong> ذرة الهيدروجين تحتوي على بروتون واحد وإلكترون واحد.</div>" },
+  { "id": "chem1-reactions", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "التفاعلات الكيميائية", "difficulty": "medium", "content": "<h2>التفاعلات الكيميائية</h2><p>التفاعلات تحول المواد المتفاعلة إلى ناتجة.</p><p><strong>مثال:</strong> 2H₂ + O₂ → 2H₂O</p><p>وهو تفاعل اتحاد بين الهيدروجين والأكسجين لتكوين الماء.</p>" },
+  { "id": "chem1-mole", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "المول والحسابات الكيميائية", "difficulty": "hard", "content": "<h2>المول</h2><p>المول هو وحدة قياس كمية المادة، ويساوي 6.022 × 10²³ وحدة.</p><p><strong>مثال:</strong> كتلة مول واحد من الماء (H₂O) = 18 جرام.</p>" },
+  { "id": "chem2-energy", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الكيمياء الحرارية", "difficulty": "medium", "content": "<h2>الكيمياء الحرارية</h2><p>دراسة انتقال الحرارة في التفاعلات.</p><ul><li>تفاعل طارد للحرارة: يطلق حرارة (مثل احتراق الخشب)</li><li>تفاعل ماص للحرارة: يمتص حرارة (مثل ذوبان الثلج)</li></ul>" },
+  { "id": "chem2-speed", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "سرعة التفاعلات الكيميائية", "difficulty": "hard", "content": "<h2>سرعة التفاعل</h2><p>سرعة التفاعل تتأثر بـ:</p><ul><li>تركيز المواد</li><li>درجة الحرارة</li><li>العوامل المساعدة (المحفزات)</li></ul>" },
+  { "id": "chem2-equilibrium", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الاتزان الكيميائي", "difficulty": "hard", "content": "<h2>الاتزان الكيميائي</h2><p>في التفاعلات العكوسة يصل النظام إلى حالة توازن.</p><p><strong>مبدأ لوتشاتيليه:</strong> إذا أثرت على نظام في حالة اتزان، فإنه يتجه نحو تقليل هذا التأثير.</p>" },
+  { "id": "chem2-hydrocarbons", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الهيدروكربونات", "difficulty": "medium", "content": "<h2>الهيدروكربونات</h2><p>مركبات تحتوي على كربون وهيدروجين.</p><ul><li>ألكانات: روابط أحادية (CH₄)</li><li>ألكينات: روابط مزدوجة (C₂H₄)</li><li>ألكاينات: روابط ثلاثية (C₂H₂)</li></ul>" },
+  { "id": "chem2-derivatives", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "مشتقات الهيدروكربونات", "difficulty": "medium", "content": "<h2>مشتقات الهيدروكربونات</h2><p>المجموعات الوظيفية تحدد خواص المركبات.</p><ul><li>كحول: يحتوي على مجموعة -OH</li><li>ألدهيد: يحتوي على مجموعة -CHO</li><li>كيتون: يحتوي على مجموعة -CO-</li></ul>" },
+  { "id": "chem2-biochemistry", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "المركبات العضوية الحيوية", "difficulty": "easy", "content": "<h2>المركبات العضوية الحيوية</h2><p>البروتينات والسكريات من الجزيئات الحيوية.</p><ul><li>البروتينات: مكونة من أحماض أمينية</li><li>السكريات: مصدر الطاقة الأساسي</li></ul>" },
+  { "id": "chem3-mixtures", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "المخاليط والمحاليل", "difficulty": "easy", "content": "<h2>المخاليط والمحاليل</h2><p>المخاليط: مزج مادتين أو أكثر دون تفاعل كيميائي.</p><ul><li>محلول: مخلوط متجانس (مثل الماء والملح)</li><li>غروي: مخلوط غير متجانس (مثل الحليب)</li><li>معلق: جسيمات كبيرة تترسب (مثل الرمل والماء)</li></ul>" },
+  { "id": "chem3-acids", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الأحماض والقواعد", "difficulty": "hard", "content": "<h2>الأحماض والقواعد</h2><div class='highlight-box'><strong>📘 تعريف الأحماض والقواعد</strong><p>الحمض: مادة تتفكك في الماء وتعطي أيونات الهيدروجين (H⁺).<br>القاعدة: مادة تتفكك في الماء وتعطي أيونات الهيدروكسيد (OH⁻).</p></div><h2>مقياس pH</h2><p>يقيس pH حموضة أو قاعدية المحلول.</p><ul><li>pH &lt; 7 → حمضي</li><li>pH = 7 → متعادل</li><li>pH &gt; 7 → قاعدي</li></ul><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/PH_scale_%281%29.png/800px-PH_scale_%281%29.png' alt='مقياس pH' style='width:100%; max-width:300px;' /><h2>فيديو توضيحي</h2><iframe src='https://www.youtube.com/embed/2pVOSwKv-b8' allowfullscreen></iframe>" },
+  { "id": "chem3-redox", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الأكسدة والاختزال", "difficulty": "medium", "content": "<h2>الأكسدة والاختزال</h2><p>تفاعلات الأكسدة والاختزال تتضمن انتقال الإلكترونات.</p><ul><li>الأكسدة: فقدان إلكترونات</li><li>الاختزال: اكتساب إلكترونات</li></ul><p><strong>مثال:</strong> 2Mg + O₂ → 2MgO (أكسدة المغنيسيوم)</p>" },
+  { "id": "chem3-electro", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الكيمياء الكهربائية", "difficulty": "hard", "content": "<h2>الكيمياء الكهربائية</h2><p>الخلايا الجلفانية تحول الطاقة الكيميائية إلى كهربائية.</p><p><strong>مثال:</strong> بطارية السيارة تعتمد على تفاعلات أكسدة-اختزال.</p>" },
+  { "id": "s-bio-1", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الخلية وتركيبها", "difficulty": "medium", "content": "<h2>الخلية</h2><p>الخلية هي الوحدة الأساسية للحياة.</p><ul><li>النواة: تحتوي على المادة الوراثية</li><li>السيتوبلازم: يحتوي على العضيات</li><li>الغشاء الخلوي: يتحكم في دخول وخروج المواد</li></ul>" },
+  { "id": "s-bio-2", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الوراثة", "difficulty": "hard", "content": "<h2>الوراثة</h2><p>مبادئ الوراثة وقوانين مندل.</p><div class='highlight-box'><strong>قانون مندل الأول:</strong> الصفات تنتقل عبر عوامل وراثية (جينات).</div><p><strong>مثال:</strong> نبات البازلاء: صفة الطول (T) سائدة على القصر (t).</p>" }
+];
+
+const TESTS = [
+  { "id": "test-p-math-1", "stage": "ابتدائي", "subjectId": "math", "title": "اختبار الأعداد والجمع", "questions": [ { "q": "ما ناتج 5 + 3؟", "options": ["5", "7", "8", "10"], "correct": 2 }, { "q": "كم عدد الأصابع في يدين؟", "options": ["8", "9", "10", "12"], "correct": 2 } ] },
+  { "id": "test-m-math-1", "stage": "اعدادي", "subjectId": "math-prep", "title": "اختبار النسبة والتناسب", "questions": [ { "q": "إذا كانت النسبة 2:3، فما النسبة المكافئة؟", "options": ["4:6", "3:2", "1:2", "6:4"], "correct": 0 }, { "q": "أوجد 20% من 80", "options": ["12", "16", "20", "24"], "correct": 1 } ] },
+  { "id": "test-verbal-1", "stage": "ثانوي", "subjectId": "verbal", "title": "اختبار استيعاب المقروء", "questions": [ { "q": "القراءة مفتاح العلم. المعنى المقصود: القراءة تساعد على...", "options": ["التسلية", "التعلم", "الترفيه", "الرياضة"], "correct": 1 }, { "q": "كلمة 'نور' مضادها:", "options": ["ظلام", "ضياء", "شمس", "قمر"], "correct": 0 } ] },
+  { "id": "test-quant-1", "stage": "ثانوي", "subjectId": "quant", "title": "اختبار الحساب والنسب", "questions": [ { "q": "ما ناتج 15 × 6؟", "options": ["80", "85", "90", "95"], "correct": 2 }, { "q": "نسبة 25% تساوي:", "options": ["1/4", "1/3", "1/2", "3/4"], "correct": 0 } ] },
+  { "id": "test-chem1-mid", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "اختبار كيمياء - مقدمة", "questions": [ { "q": "يوجد غاز الأوزون في طبقة:", "options": ["التروبوسفير", "الستراتوسفير", "الميزوسفير", "الأكسوسفير"], "correct": 1 }, { "q": "ما فرع الكيمياء الذي يدرس مواد التغليف؟", "options": ["الكيمياء الحيوية", "الكيمياء العضوية", "الكيمياء البيئية", "الكيمياء الفيزيائية"], "correct": 2 } ] },
+  { "id": "test-chem3-final", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "اختبار كيمياء شامل", "questions": [ { "q": "تفاعل حمض مع قاعدة يسمى:", "options": ["التعادل", "الأكسدة", "الاختزال", "الترسيب"], "correct": 0 }, { "q": "الحركة البراونية تحدث في:", "options": ["المحاليل الحقيقية", "المخاليط الغروية", "المعلقات", "العناصر"], "correct": 1 } ] }
+];
+
+// ================================================================
+// 2. إدارة البيانات (localStorage)
+// ================================================================
+const STORAGE_KEY = 'success_assistant';
+
+function getDefaultUser() {
+  return { name: '', stage: '', goal: 90, points: 0, completedLessons: [], testResults: [], dailyMinutes: 60, plan: [], selectedCategory: null, selectedSubject: null };
+}
+
+function loadUser() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      const def = getDefaultUser();
+      for (let key in def) if (!(key in data)) data[key] = def[key];
+      return data;
+    }
+  } catch (e) { console.warn(e); }
+  return getDefaultUser();
+}
+
+function saveUser(user) { localStorage.setItem(STORAGE_KEY, JSON.stringify(user)); }
+
+// ================================================================
+// 3. دوال مساعدة
+// ================================================================
+function getSubjectsForStage(stage) { return SUBJECTS.filter(s => s.stage === stage); }
+function getLessonsForStage(stage) { return LESSONS.filter(l => l.stage === stage); }
+function getTestsForStage(stage) { return TESTS.filter(t => t.stage === stage); }
+function getCategoriesForStage(stage) {
+  const cats = new Set();
+  SUBJECTS.filter(s => s.stage === stage).forEach(s => { if (s.category) cats.add(s.category); });
+  return Array.from(cats);
+}
+
+function getOverallProgress(user) {
+  const stageLessons = getLessonsForStage(user.stage);
+  const total = stageLessons.length;
+  const completed = user.completedLessons.filter(id => stageLessons.some(l => l.id === id)).length;
+  return total > 0 ? Math.round((completed/total)*100) : 0;
+}
+
+function getWeakTopics(user) {
+  const map = {};
+  const stageTests = getTestsForStage(user.stage);
+  user.testResults.forEach(tr => {
+    const test = stageTests.find(t => t.id === tr.testId);
+    if (!test) return;
+    const subject = SUBJECTS.find(s => s.id === test.subjectId);
+    if (!subject) return;
+    if (!map[subject.name]) map[subject.name] = [];
+    map[subject.name].push(tr.score);
+  });
+  const weak = [];
+  for (let sub in map) {
+    const avg = map[sub].reduce((a,b) => a+b, 0) / map[sub].length;
+    if (avg < 70) weak.push({ subject: sub, score: Math.round(avg) });
+  }
+  weak.sort((a,b) => a.score - b.score);
+  return weak;
+}
+
+function getStrengths(user) {
+  const map = {};
+  const stageTests = getTestsForStage(user.stage);
+  user.testResults.forEach(tr => {
+    const test = stageTests.find(t => t.id === tr.testId);
+    if (!test) return;
+    const subject = SUBJECTS.find(s => s.id === test.subjectId);
+    if (!subject) return;
+    if (!map[subject.name]) map[subject.name] = [];
+    map[subject.name].push(tr.score);
+  });
+  const strong = [];
+  for (let sub in map) {
+    const avg = map[sub].reduce((a,b) => a+b, 0) / map[sub].length;
+    if (avg >= 80) strong.push({ subject: sub, score: Math.round(avg) });
+  }
+  strong.sort((a,b) => b.score - a.score);
+  return strong;
+}
+
+function generatePlan(user) {
+  const days = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+  const weak = getWeakTopics(user);
+  const stageLessons = getLessonsForStage(user.stage);
+  const notCompleted = stageLessons.filter(l => !user.completedLessons.includes(l.id));
+  const plan = [];
+  for (let i=0; i<7; i++) {
+    let task = 'مراجعة عامة';
+    if (weak.length > 0 && i < weak.length) task = `تدريب على "${weak[i].subject}"`;
+    else if (notCompleted.length > 0 && i < notCompleted.length) task = `دراسة "${notCompleted[i].title}"`;
+    else if (i===0) task = 'مراجعة الأخطاء';
+    else if (i===1) task = 'اختبار قصير';
+    else if (i===2) task = 'حل تمارين متنوعة';
+    else if (i===3) task = 'مراجعة المفاهيم الأساسية';
+    else if (i===4) task = 'تدريب على المهارات الضعيفة';
+    else if (i===5) task = 'اختبار تجريبي';
+    else task = 'مراجعة شاملة';
+    const old = user.plan || [];
+    const oldItem = old.find(p => p.day === days[i]);
+    plan.push({ day: days[i], task, done: oldItem ? oldItem.done : false });
+  }
+  return plan;
+}
+
+// ================================================================
+// 4. التنقل والمودال
+// ================================================================
+function navigateTo(page) {
+  switch(page) {
+    case 'home': renderHome(); break;
+    case 'train': renderTrain(); break;
+    case 'test': renderTests(); break;
+    case 'analysis': renderAnalysis(); break;
+    case 'plan': renderPlan(); break;
+  }
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+}
+
+function showModal(html) {
+  document.getElementById('contentModalBody').innerHTML = html;
+  document.getElementById('contentModal').classList.add('active');
+}
+function closeModal() { document.getElementById('contentModal').classList.remove('active'); }
+document.getElementById('contentModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ================================================================
+// 5. دوال الدروس والاختبارات
+// ================================================================
+function openLesson(lessonId) {
+  const lesson = LESSONS.find(l => l.id === lessonId);
+  if (!lesson) return;
+  const user = loadUser();
+  if (user.completedLessons.includes(lessonId)) { alert('هذا الدرس مكتمل بالفعل!'); return; }
+  const subject = SUBJECTS.find(s => s.id === lesson.subjectId);
+  const html = `
+    <div class="lesson-header">
+      <h2>${lesson.title}</h2>
+      <div class="meta"><i class="fas fa-book"></i> ${subject ? subject.name : ''} <span style="margin:0 8px;">•</span> <i class="fas fa-signal"></i> ${lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم'}</div>
+    </div>
+    <div class="lesson-content">${lesson.content || '<p class="text-muted">لا يوجد محتوى لهذا الدرس حالياً.</p>'}</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()"><i class="fas fa-arrow-right"></i> رجوع</button>
+      <button class="btn btn-success" onclick="completeLesson('${lessonId}')"><i class="fas fa-check"></i> إنهاء الدرس</button>
+    </div>
+  `;
+  showModal(html);
+}
+
+function completeLesson(lessonId) {
+  const user = loadUser();
+  if (user.completedLessons.includes(lessonId)) { closeModal(); return; }
+  user.completedLessons.push(lessonId);
+  user.points = (user.points || 0) + 10;
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  const firstPending = plan.find(p => !p.done);
+  if (firstPending) firstPending.done = true;
+  user.plan = plan;
+  saveUser(user);
+  closeModal();
+  renderHome();
+  updateHeader();
+  alert('✅ تم إكمال الدرس بنجاح!');
+}
+
+function startTest(testId) {
+  const test = TESTS.find(t => t.id === testId);
+  if (!test) return;
+  const user = loadUser();
+  if (user.testResults.find(r => r.testId === testId)) { alert('قمت بهذا الاختبار بالفعل.'); return; }
+  let html = `<h2>${test.title}</h2><form id="quizForm">`;
+  test.questions.forEach((q, idx) => {
+    html += `<div style="background:#f8faff; padding:12px; border-radius:16px; margin-bottom:12px;"><div style="font-weight:600; margin-bottom:8px;">${idx+1}. ${q.q}</div>`;
+    q.options.forEach((opt, oi) => {
+      html += `<label class="option"><input type="radio" name="q${idx}" value="${oi}" required /> ${opt}</label>`;
+    });
+    html += `</div>`;
+  });
+  html += `<div class="modal-actions"><button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button><button type="submit" class="btn"><i class="fas fa-paper-plane"></i> إرسال</button></div></form><div id="quizResult"></div>`;
+  showModal(html);
+  document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    let correct = 0;
+    test.questions.forEach((q, idx) => {
+      const selected = formData.get(`q${idx}`);
+      if (selected !== null && parseInt(selected) === q.correct) correct++;
+    });
+    const percent = Math.round((correct / test.questions.length) * 100);
+    if (!user.testResults.find(r => r.testId === testId)) {
+      user.testResults.push({ testId, score: percent });
+      user.points = (user.points || 0) + 20;
+      saveUser(user);
+    }
+    document.getElementById('quizResult').innerHTML = `<div class="result-box"><div class="score-big">${percent}%</div><div>الإجابات الصحيحة: ${correct} من ${test.questions.length}</div><button class="btn btn-sm btn-success" onclick="closeModal(); renderHome(); updateHeader();" style="margin-top:10px;">عرض النتائج</button></div>`;
+    document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
+    updateHeader();
+  });
+}
+
+function togglePlanDay(idx) {
+  const user = loadUser();
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  if (idx >= 0 && idx < plan.length) { plan[idx].done = !plan[idx].done; user.plan = plan; saveUser(user); renderPlan(); }
+}
+
+function generatePlanFromUI() {
+  const user = loadUser();
+  user.plan = generatePlan(user);
+  saveUser(user);
+  renderPlan();
+  alert('تم إعادة بناء الخطة بنجاح!');
+}
+
+// ================================================================
+// 6. صفحات التطبيق
+// ================================================================
+function renderHome() {
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const progress = getOverallProgress(user);
+  const weak = getWeakTopics(user);
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  const today = new Date().getDay();
+  const daysMap = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const todayTask = plan.find(p => p.day === daysMap[today]);
+  const stageLessons = getLessonsForStage(user.stage);
+  const total = stageLessons.length;
+  const completed = user.completedLessons.filter(id => stageLessons.some(l => l.id === id)).length;
+
+  container.innerHTML = `
+    <div class="page active" id="page-home">
+      <div style="margin-bottom:16px;">أهلاً بك 👋 <strong>${user.name}</strong> (${user.stage})</div>
+      <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> مستواك الحالي</div><div class="flex-row"><span style="font-size:28px; font-weight:700;">${progress}%</span><span>هدفك: <strong>${user.goal}%</strong></span></div><div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div><div class="flex-row mt-2 text-muted"><span><i class="fas fa-check-circle" style="color:#34c759;"></i> ${completed} درس</span><span>من ${total}</span></div></div>
+      <div class="card" onclick="navigateTo('train')" style="cursor:pointer;"><div class="card-title"><i class="fas fa-fire" style="color:#ff9500;"></i> مهمتك اليوم</div><div>${todayTask ? todayTask.task : 'لا توجد مهام اليوم'}</div><button class="btn btn-sm" onclick="event.stopPropagation(); navigateTo('train')">ابدأ التدريب</button></div>
+      <div class="card" onclick="navigateTo('plan')" style="cursor:pointer;"><div class="card-title"><i class="fas fa-exclamation-circle" style="color:#ff3b30;"></i> أخطاء تحتاج مراجعة</div><div>${weak.reduce((s,w) => s + (100-w.score)/10, 0).toFixed(0)} سؤالاً</div></div>
+      <div class="card" style="border-right:4px solid #5b7cfa; background:#f8faff;"><div class="card-title" style="font-size:14px;"><i class="fas fa-robot"></i> اقتراح المدرب لك اليوم</div><div>${weak.length ? `ركّز على "${weak[0].subject}"؛ فهي من أكثر المهارات التي تخسر فيها درجات.` : 'أداؤك ممتاز! واصل بنفس الوتيرة.'}</div><button class="btn btn-sm btn-outline" onclick="navigateTo('plan')" style="margin-top:8px;">اطلع على خطتك ←</button></div>
+    </div>
+  `;
+}
+
+function renderTrain() {
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const subjects = getSubjectsForStage(user.stage);
+  const categories = getCategoriesForStage(user.stage);
+  let html = `<div class="page active" id="page-train">`;
+  if (categories.length > 0) {
+    html += `<div class="category-tabs">${categories.map(cat => `<button class="category-tab ${user.selectedCategory === cat ? 'active' : ''}" data-category="${cat}">${cat === 'قدرات' ? '🎯 قدرات' : '📚 تحصيلي'}</button>`).join('')}</div>`;
+  }
+  let filteredSubjects = subjects;
+  if (user.selectedCategory) filteredSubjects = subjects.filter(s => s.category === user.selectedCategory);
+  html += `<div class="subject-tabs"><button class="subject-tab ${!user.selectedSubject ? 'active' : ''}" data-subject="all">الكل</button>${filteredSubjects.map(s => `<button class="subject-tab ${user.selectedSubject === s.id ? 'active' : ''}" data-subject="${s.id}">${s.name}</button>`).join('')}</div><div id="lessonsList">`;
+  let lessons = getLessonsForStage(user.stage);
+  if (user.selectedCategory) {
+    const ids = filteredSubjects.map(s => s.id);
+    lessons = lessons.filter(l => ids.includes(l.subjectId));
+  }
+  if (user.selectedSubject) lessons = lessons.filter(l => l.subjectId === user.selectedSubject);
+  if (lessons.length === 0) html += `<div class="text-muted">لا توجد دروس للمادة المختارة.</div>`;
+  else {
+    const completedIds = new Set(user.completedLessons);
+    lessons.forEach(lesson => {
+      const isCompleted = completedIds.has(lesson.id);
+      const diff = lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم';
+      const subjectName = SUBJECTS.find(s => s.id === lesson.subjectId)?.name || '';
+      html += `<div class="lesson-item"><div class="info"><div class="title">${lesson.title}</div><div class="sub">${diff} • ${subjectName}</div></div><div class="actions">${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : `<button class="btn btn-sm" onclick="openLesson('${lesson.id}')">بدء الدراسة</button>`}</div></div>`;
+    });
+  }
+  html += `</div></div>`;
+  container.innerHTML = html;
+  container.querySelectorAll('.category-tab').forEach(btn => {
+    btn.addEventListener('click', function() { user.selectedCategory = this.dataset.category; user.selectedSubject = null; saveUser(user); renderTrain(); });
+  });
+  container.querySelectorAll('.subject-tab').forEach(btn => {
+    btn.addEventListener('click', function() { const id = this.dataset.subject; user.selectedSubject = id === 'all' ? null : id; saveUser(user); renderTrain(); });
+  });
+}
+
+function renderTests() {
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const stageTests = getTestsForStage(user.stage);
+  const solvedIds = new Set(user.testResults.map(r => r.testId));
+  const available = stageTests.filter(t => !solvedIds.has(t.id));
+  const past = user.testResults.map(tr => { const test = stageTests.find(t => t.id === tr.testId); return test ? { ...test, score: tr.score } : null; }).filter(Boolean);
+  let html = `<div class="page active" id="page-test"><div class="card"><div class="card-title">📝 اختبارات متاحة</div><div id="availableTests">`;
+  if (available.length === 0) html += `<div class="text-muted">🎉 لا توجد اختبارات جديدة حالياً.</div>`;
+  else {
+    available.forEach(test => {
+      const subject = SUBJECTS.find(s => s.id === test.subjectId);
+      html += `<div class="test-card"><div class="title">${test.title}</div><div class="meta">${subject ? subject.name : ''} • ${test.questions.length} سؤالاً</div><button class="btn btn-sm" onclick="startTest('${test.id}')">ابدأ الاختبار</button></div>`;
+    });
+  }
+  html += `</div></div><div class="card" style="margin-top:16px;"><div class="card-title">📊 اختبارات سابقة</div><div id="pastTests">`;
+  if (past.length === 0) html += `<div class="text-muted">لا توجد اختبارات سابقة</div>`;
+  else {
+    past.forEach(test => {
+      html += `<div class="test-card" style="border-right-color:#8a9bb5;"><div class="flex-row"><span class="title">${test.title}</span><span style="font-weight:700;">${test.score}%</span></div><div class="meta">تم الحل</div></div>`;
+    });
+  }
+  html += `</div></div></div>`;
+  container.innerHTML = html;
+}
+
+function renderAnalysis() {
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const progress = getOverallProgress(user);
+  const strengths = getStrengths(user);
+  const weak = getWeakTopics(user);
+  container.innerHTML = `<div class="page active" id="page-analysis"><div class="card"><div class="card-title">مستواك العام</div><div style="font-size:32px; font-weight:700;">${progress}%</div><div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div></div><div class="card"><div class="card-title">نقاط القوة 💪</div><div>${strengths.length ? strengths.slice(0,3).map(s => `<div class="skill-item"><span>${s.subject}</span><span style="font-weight:600; color:#34c759;">${s.score}%</span></div>`).join('') : '<div class="text-muted">لا توجد بيانات كافية</div>'}</div></div><div class="card"><div class="card-title">تحتاج إلى تطوير 🔥</div><div>${weak.length ? weak.slice(0,3).map(w => `<div class="skill-item"><span>${w.subject}</span><span style="font-weight:600; color:#ff3b30;">${w.score}%</span></div>`).join('') : '<div class="text-muted">🎉 لا توجد نقاط ضعف ملحوظة</div>'}</div></div><div class="card" style="border-right:4px solid #ff9500;"><div class="card-title" style="font-size:14px;"><i class="fas fa-lightbulb"></i> توصية</div><div>${weak.length ? `لو ركزت على "${weak[0].subject}" لمدة 7 أيام، يمكنك تحسين مستواك بشكل ملحوظ.` : 'أداؤك ممتاز! حافظ على هذا المستوى.'}</div></div></div>`;
+}
+
+function renderPlan() {
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const plan = user.plan.length ? user.plan : generatePlan(user);
+  const total = plan.length;
+  const done = plan.filter(p => p.done).length;
+  const percent = total > 0 ? Math.round((done/total)*100) : 0;
+  container.innerHTML = `<div class="page active" id="page-plan"><div class="card"><div class="flex-row"><span>خطة الوصول إلى <strong>${user.goal}%</strong></span><span class="badge">${total - done} يوم متبقي</span></div><div class="progress-bar"><div class="fill" style="width:${percent}%"></div></div><div class="flex-row text-muted" style="font-size:13px;">مكتمل: ${percent}%</div></div><div id="planDaysList">${plan.map((item, idx) => `<div class="plan-day"><div class="day">${item.day}</div><div class="task">${item.task}</div><div class="status ${item.done ? 'done' : 'pending'}" onclick="togglePlanDay(${idx})"><i class="fas ${item.done ? 'fa-check-circle' : 'fa-circle'}"></i></div></div>`).join('')}</div><div class="card"><div class="card-title">كم تستطيع الدراسة يومياً؟</div><div style="display:flex; gap:8px; flex-wrap:wrap;">${[30,45,60,90].map(m => `<button class="btn btn-sm btn-outline time-option ${user.dailyMinutes === m ? 'active' : ''}" data-minutes="${m}">${m} د</button>`).join('')}</div><div style="margin-top:10px;"><button class="btn btn-sm" onclick="generatePlanFromUI()">إعادة بناء الخطة</button></div></div></div>`;
+  container.querySelectorAll('.time-option').forEach(btn => {
+    btn.addEventListener('click', function() { user.dailyMinutes = parseInt(this.dataset.minutes); user.plan = generatePlan(user); saveUser(user); renderPlan(); });
+  });
+}
+
+// ================================================================
+// 7. إدارة الملف الشخصي
+// ================================================================
+function editProfile() {
+  const user = loadUser();
+  document.getElementById('inputName').value = user.name || '';
+  document.querySelectorAll('#stageOptions button').forEach(btn => btn.classList.toggle('active', btn.dataset.stage === user.stage));
+  document.getElementById('welcomeTitle').textContent = 'تعديل الملف الشخصي';
+  document.getElementById('welcomeSub').textContent = 'يمكنك تغيير اسمك ومرحلتك';
+  document.getElementById('startAppBtn').textContent = 'حفظ التغييرات';
+  document.getElementById('welcomeModal').classList.add('active');
+}
+function closeWelcomeModal() { document.getElementById('welcomeModal').classList.remove('active'); }
+
+function resetProgress() {
+  if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
+    const old = loadUser();
+    const def = getDefaultUser();
+    def.name = old.name || '';
+    def.stage = old.stage || '';
+    saveUser(def);
+    renderHome();
+    updateHeader();
+  }
+}
+
+function addSampleData() {
+  const user = loadUser();
+  const stageLessons = getLessonsForStage(user.stage);
+  const sampleIds = stageLessons.slice(0, 3).map(l => l.id);
+  let added = 0;
+  sampleIds.forEach(id => {
+    if (!user.completedLessons.includes(id)) { user.completedLessons.push(id); user.points = (user.points || 0) + 10; added++; }
+  });
+  saveUser(user);
+  renderHome();
+  updateHeader();
+  alert(`تمت إضافة ${added} دروس نموذجية!`);
+}
+
+function updateHeader() {
+  const user = loadUser();
+  document.getElementById('userNameDisplay').textContent = user.name || 'طالب';
+  document.getElementById('userStageDisplay').textContent = user.stage || '';
+  document.getElementById('userPointsDisplay').textContent = user.points || 0;
+}
+
+// ================================================================
+// 8. التهيئة
+// ================================================================
+function initApp() {
+  let user = loadUser();
+  if (!user.stage) {
+    document.getElementById('welcomeModal').classList.add('active');
+    document.getElementById('startAppBtn').onclick = function() {
+      const name = document.getElementById('inputName').value.trim();
+      const stage = document.querySelector('#stageOptions button.active')?.dataset.stage || 'ثانوي';
+      if (!name) { alert('الرجاء إدخال اسمك'); return; }
+      user.name = name;
+      user.stage = stage;
+      user.plan = generatePlan(user);
+      saveUser(user);
+      closeWelcomeModal();
+      updateHeader();
+      navigateTo('home');
+    };
+    return;
+  }
+  updateHeader();
+  navigateTo('home');
+}
+
+document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+  btn.addEventListener('click', function() { navigateTo(this.dataset.page); });
+});
+document.getElementById('welcomeModal').addEventListener('click', function(e) {
+  if (e.target === this) { const user = loadUser(); if (!user.stage) return; this.classList.remove('active'); }
+});
+document.querySelectorAll('#stageOptions button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#stageOptions button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
 </body>
 </html>
