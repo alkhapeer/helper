@@ -20,7 +20,7 @@ function renderTests() {
     html += `<div class="text-muted">🎉 لا توجد اختبارات جديدة حالياً.</div>`;
   } else {
     available.forEach(test => {
-      const subject = SUBJECTS.find(s => s.id === test.subjectId);
+      const subject = (SUBJECTS || []).find(s => s.id === test.subjectId);
       html += `
         <div class="test-card">
           <div class="title">${test.title}</div>
