@@ -4,7 +4,7 @@ function renderPlan() {
   const plan = user.plan.length ? user.plan : generatePlan(user);
   const total = plan.length;
   const done = plan.filter(p => p.done).length;
-  const percent = total > 0 ? Math.round((done/total)*100) : 0;
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
 
   container.innerHTML = `
     <div class="page active" id="page-plan">
@@ -30,7 +30,7 @@ function renderPlan() {
       <div class="card">
         <div class="card-title">كم تستطيع الدراسة يومياً؟</div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          ${[30,45,60,90].map(m => `
+          ${[30, 45, 60, 90].map(m => `
             <button class="btn btn-sm btn-outline time-option ${user.dailyMinutes === m ? 'active' : ''}" data-minutes="${m}">${m} د</button>
           `).join('')}
         </div>
