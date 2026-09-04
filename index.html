@@ -329,6 +329,10 @@ function navigateTo(page) {
   }
   document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
 }
+// دالة goTo للتوافق مع الإصدارات السابقة
+function goTo(section) {
+  navigateTo(section);
+}
 
 function showModal(html) {
   document.getElementById('contentModalBody').innerHTML = html;
@@ -360,9 +364,13 @@ function openLesson(lessonId) {
   showModal(html);
 }
 
+// تعديل دالة completeLesson للتأكد من عرض الرسالة الصحيحة
 function completeLesson(lessonId) {
   const user = loadUser();
-  if (user.completedLessons.includes(lessonId)) { closeModal(); return; }
+  if (user.completedLessons.includes(lessonId)) { 
+    closeModal(); 
+    return; 
+  }
   user.completedLessons.push(lessonId);
   user.points = (user.points || 0) + 10;
   const plan = user.plan.length ? user.plan : generatePlan(user);
@@ -373,14 +381,22 @@ function completeLesson(lessonId) {
   closeModal();
   renderHome();
   updateHeader();
+  // عرض رسالة نجاح فقط
   alert('✅ تم إكمال الدرس بنجاح!');
 }
 
+// تعديل دالة startTest لإزالة أي رسائل غير مرغوبة وإضافة رسالة نجاح بعد الإرسال
 function startTest(testId) {
   const test = TESTS.find(t => t.id === testId);
-  if (!test) return;
+  if (!test) {
+    alert('الاختبار غير موجود');
+    return;
+  }
   const user = loadUser();
-  if (user.testResults.find(r => r.testId === testId)) { alert('قمت بهذا الاختبار بالفعل.'); return; }
+  if (user.testResults.find(r => r.testId === testId)) {
+    alert('قمت بهذا الاختبار بالفعل.');
+    return;
+  }
   let html = `<h2>${test.title}</h2><form id="quizForm">`;
   test.questions.forEach((q, idx) => {
     html += `<div style="background:#f8faff; padding:12px; border-radius:16px; margin-bottom:12px;"><div style="font-weight:600; margin-bottom:8px;">${idx+1}. ${q.q}</div>`;
@@ -391,6 +407,7 @@ function startTest(testId) {
   });
   html += `<div class="modal-actions"><button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button><button type="submit" class="btn"><i class="fas fa-paper-plane"></i> إرسال</button></div></form><div id="quizResult"></div>`;
   showModal(html);
+  
   document.getElementById('quizForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -408,6 +425,10 @@ function startTest(testId) {
     document.getElementById('quizResult').innerHTML = `<div class="result-box"><div class="score-big">${percent}%</div><div>الإجابات الصحيحة: ${correct} من ${test.questions.length}</div><button class="btn btn-sm btn-success" onclick="closeModal(); renderHome(); updateHeader();" style="margin-top:10px;">عرض النتائج</button></div>`;
     document.getElementById('quizForm').querySelector('button[type="submit"]').disabled = true;
     updateHeader();
+    // عرض رسالة نجاح (بدلاً من alert)
+    // يمكنك إظهار رسالة داخل المودال بدلاً من alert
+    // لكن يمكنك إضافة alert إذا أردت:
+    // alert(`✅ تم إكمال الاختبار بنجاح! نتيجتك: ${percent}%`);
   });
 }
 
