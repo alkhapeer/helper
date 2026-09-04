@@ -71,15 +71,23 @@ function openLesson(lessonId) {
     return;
   }
   const subject = SUBJECTS.find(s => s.id === lesson.subjectId);
+  
+  // بناء المحتوى مع تنسيق أفضل
   const html = `
-    <h2>${lesson.title}</h2>
-    <div class="text-muted">${subject ? subject.name : ''} • ${lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم'}</div>
-    <div style="background:#f8faff; padding:16px; border-radius:16px; line-height:1.8; margin:12px 0;">
-      ${lesson.content || 'لا يوجد محتوى حالياً.'}
+    <div class="lesson-header">
+      <h2>${lesson.title}</h2>
+      <div class="meta">
+        <i class="fas fa-book"></i> ${subject ? subject.name : ''} 
+        <span style="margin:0 8px;">•</span>
+        <i class="fas fa-signal"></i> ${lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم'}
+      </div>
+    </div>
+    <div class="lesson-content">
+      ${lesson.content || '<p class="text-muted">لا يوجد محتوى لهذا الدرس حالياً.</p>'}
     </div>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">رجوع</button>
-      <button class="btn btn-success" onclick="completeLesson('${lessonId}')">إنهاء الدرس</button>
+      <button class="btn btn-outline" onclick="closeModal()"><i class="fas fa-arrow-right"></i> رجوع</button>
+      <button class="btn btn-success" onclick="completeLesson('${lessonId}')"><i class="fas fa-check"></i> إنهاء الدرس</button>
     </div>
   `;
   showModal(html);
