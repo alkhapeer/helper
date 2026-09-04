@@ -1,57 +1,75 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>مساعد النجاح</title>
-    <!-- الخطوط والأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- الملفات الخاصة -->
-    <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مساعد النجاح</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <div class="app" id="app">
-        <!-- رأس الصفحة العلوي (ثابت) -->
-        <header class="app-header">
-            <div class="header-title">مساعد النجاح</div>
-            <div class="user-info">
-                <i class="fas fa-user-circle"></i>
-                <span id="userNameDisplay">طالب</span>
-            </div>
-        </header>
+  <div class="app" id="app">
+    <!-- الرأس العلوي -->
+    <header class="app-header" id="appHeader">
+      <div class="header-title">مساعد النجاح</div>
+      <div class="user-info" onclick="editProfile()">
+        <i class="fas fa-user-graduate"></i>
+        <span id="userNameDisplay">طالب</span>
+        <span id="userStageDisplay" class="stage-badge"></span>
+        <span id="userPointsDisplay">0</span>
+      </div>
+    </header>
 
-        <!-- الصفحات (تظهر حسب التنقل) -->
-        <main id="page-container">
-            <!-- سيتم تحميل محتوى كل صفحة عبر JavaScript -->
-        </main>
+    <!-- حاوية الصفحات -->
+    <main id="page-container">
+      <!-- يتم تحميل الصفحات عبر JavaScript -->
+    </main>
 
-        <!-- شريط التنقل السفلي -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-page="home"><i class="fas fa-home"></i> الرئيسية</button>
-            <button class="nav-item" data-page="train"><i class="fas fa-dumbbell"></i> تدرب</button>
-            <button class="nav-item" data-page="test"><i class="fas fa-pencil-alt"></i> اختبار</button>
-            <button class="nav-item" data-page="analysis"><i class="fas fa-chart-pie"></i> تحليلي</button>
-            <button class="nav-item" data-page="plan"><i class="fas fa-calendar-check"></i> خطتي</button>
-        </nav>
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="home"><i class="fas fa-home"></i> الرئيسية</button>
+      <button class="nav-item" data-page="train"><i class="fas fa-dumbbell"></i> تدرب</button>
+      <button class="nav-item" data-page="test"><i class="fas fa-pencil-alt"></i> اختبار</button>
+      <button class="nav-item" data-page="analysis"><i class="fas fa-chart-pie"></i> تحليلي</button>
+      <button class="nav-item" data-page="plan"><i class="fas fa-calendar-check"></i> خطتي</button>
+    </nav>
+  </div>
+
+  <!-- مودال الترحيب (يظهر لأول مرة) -->
+  <div class="modal-overlay" id="welcomeModal">
+    <div class="modal-box">
+      <h2>مرحباً بك في مساعد النجاح</h2>
+      <p>أخبرنا عن نفسك لنخصص لك التجربة</p>
+      <label>الاسم</label>
+      <input type="text" id="inputName" placeholder="اكتب اسمك" />
+      <label>المرحلة الدراسية</label>
+      <div class="stage-options" id="stageOptions">
+        <button data-stage="ابتدائي">ابتدائي</button>
+        <button data-stage="اعدادي">اعدادي</button>
+        <button data-stage="ثانوي" class="active">ثانوي</button>
+      </div>
+      <button class="btn btn-start-app" id="startAppBtn">ابدأ الرحلة</button>
     </div>
+  </div>
 
-    <!-- مودال عام -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-box" id="modalBox">
-            <div id="modalContent"></div>
-        </div>
+  <!-- مودال عرض المحتوى (درس / اختبار) -->
+  <div class="modal-overlay" id="contentModal">
+    <div class="modal-box" id="contentModalBox">
+      <div id="contentModalBody"></div>
     </div>
+  </div>
 
-    <!-- تحميل ملفات JavaScript -->
-    <script src="data/subjects.json"></script> <!-- سيتم تحميلها كـ JSON -->
-    <script src="data/lessons.json"></script>
-    <script src="data/tests.json"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/pages/home.js"></script>
-    <script src="js/pages/train.js"></script>
-    <script src="js/pages/test.js"></script>
-    <script src="js/pages/analysis.js"></script>
-    <script src="js/pages/plan.js"></script>
-    <script src="js/app.js"></script>
+  <!-- تحميل البيانات والجافاسكريبت -->
+  <script src="data/subjects.json"></script>
+  <script src="data/lessons.json"></script>
+  <script src="data/tests.json"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/pages/home.js"></script>
+  <script src="js/pages/train.js"></script>
+  <script src="js/pages/test.js"></script>
+  <script src="js/pages/analysis.js"></script>
+  <script src="js/pages/plan.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
