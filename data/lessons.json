@@ -1,9 +1,4 @@
 [
-    { "id": "math1", "subjectId": "math", "title": "الأعداد من 1 إلى 100", "difficulty": "easy", "content": "شرح الأعداد ..." },
-    { "id": "math2", "subjectId": "math", "title": "الجمع والطرح", "difficulty": "easy", "content": "شرح الجمع ..." },
-    { "id": "math3", "subjectId": "math", "title": "الضرب والقسمة", "difficulty": "medium", "content": "شرح الضرب ..." },
-    { "id": "arabic1", "subjectId": "arabic", "title": "الحروف الهجائية", "difficulty": "easy", "content": "شرح الحروف ..." },
-    { "id": "arabic2", "subjectId": "arabic", "title": "المفرد والمثنى والجمع", "difficulty": "medium", "c[
   { "id": "p-math-1", "stage": "ابتدائي", "subjectId": "math", "title": "الأعداد من 1 إلى 100", "difficulty": "easy", "content": "تعلم الأعداد من 1 إلى 100 مع تمارين." },
   { "id": "p-math-2", "stage": "ابتدائي", "subjectId": "math", "title": "الجمع والطرح", "difficulty": "easy", "content": "تعلم أساسيات الجمع والطرح." },
   { "id": "p-arabic-1", "stage": "ابتدائي", "subjectId": "arabic", "title": "الحروف الهجائية", "difficulty": "easy", "content": "تعلم الحروف الأبجدية." },
@@ -35,12 +30,4 @@
   { "id": "chem3-electro", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الكيمياء الكهربائية", "difficulty": "hard", "content": "الخلايا الجلفانية تحول الطاقة الكيميائية إلى كهربائية." },
   { "id": "s-bio-1", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الخلية وتركيبها", "difficulty": "medium", "content": "تركيب الخلية ووظائفها." },
   { "id": "s-bio-2", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الوراثة", "difficulty": "hard", "content": "مبادئ الوراثة وقوانين مندل." }
-]ontent": "شرح المفرد ..." },
-    { "id": "prep-math1", "subjectId": "math-prep", "title": "النسبة والتناسب", "difficulty": "medium", "content": "شرح النسبة ..." },
-    { "id": "prep-math2", "subjectId": "math-prep", "title": "المعادلات الخطية", "difficulty": "hard", "content": "شرح المعادلات ..." },
-    { "id": "prep-phys1", "subjectId": "physics", "title": "الحركة والسرعة", "difficulty": "medium", "content": "شرح الحركة ..." },
-    { "id": "sec-math1", "subjectId": "math-sec", "title": "التفاضل", "difficulty": "hard", "content": "شرح التفاضل ..." },
-    { "id": "sec-math2", "subjectId": "math-sec", "title": "التكامل", "difficulty": "hard", "content": "شرح التكامل ..." },
-    { "id": "sec-chem1", "subjectId": "chemistry-sec", "title": "الذرة والتوزيع الإلكتروني", "difficulty": "medium", "content": "شرح الذرة ..." },
-    { "id": "sec-chem2", "subjectId": "chemistry-sec", "title": "التفاعلات الكيميائية", "difficulty": "hard", "content": "شرح التفاعلات ..." }
 ]
