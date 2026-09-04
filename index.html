@@ -363,6 +363,26 @@
     { id: 'physics-01', subject: 'الفيزياء', title: 'الحركة', difficulty: 'hard' },
     { id: 'physics-02', subject: 'الفيزياء', title: 'القوى', difficulty: 'medium' },
     { id: 'english-01', subject: 'اللغة الإنجليزية', title: 'المحادثة', difficulty: 'easy' },
+     id: 'chem1-intro', subject: 'الكيمياء', title: 'مقدمة في علم الكيمياء والطريقة العلمية', difficulty: 'easy' },
+  { id: 'chem1-matter', subject: 'الكيمياء', title: 'المادة: الخواص والتغيرات وتصنيفاتها', difficulty: 'easy' },
+  { id: 'chem1-atom', subject: 'الكيمياء', title: 'تركيب الذرة والتوزيع الإلكتروني', difficulty: 'medium' },
+  { id: 'chem1-reactions', subject: 'الكيمياء', title: 'التفاعلات الكيميائية والمعادلات الأيونية', difficulty: 'medium' },
+  { id: 'chem1-mole', subject: 'الكيمياء', title: 'المول والحسابات الكيميائية وصيغ المركبات', difficulty: 'hard' },
+
+  // كيمياء 2-2 (الثاني الثانوي)
+  { id: 'chem2-energy', subject: 'الكيمياء', title: 'الطاقة والتغيرات الكيميائية (الكيمياء الحرارية)', difficulty: 'medium' },
+  { id: 'chem2-speed', subject: 'الكيمياء', title: 'سرعة التفاعلات الكيميائية ورتب التفاعل', difficulty: 'hard' },
+  { id: 'chem2-equilibrium', subject: 'الكيمياء', title: 'الاتزان الكيميائي ومبدأ لوتشاتيليه', difficulty: 'hard' },
+  { id: 'chem2-hydrocarbons', subject: 'الكيمياء', title: 'الهيدروكربونات وتسمية الـ IUPAC', difficulty: 'medium' },
+  { id: 'chem2-derivatives', subject: 'الكيمياء', title: 'مشتقات الهيدروكربونات والمجموعات الوظيفية', difficulty: 'medium' },
+  { id: 'chem2-biochemistry', subject: 'الكيمياء', title: 'المركبات العضوية الحيوية (البروتينات والسكريات)', difficulty: 'easy' },
+
+  // كيمياء 3 (الثالث الثانوي)
+  { id: 'chem3-mixtures', subject: 'الكيمياء', title: 'المخاليط والمحاليل والخواص الجامعة', difficulty: 'easy' },
+  { id: 'chem3-acids', subject: 'الكيمياء', title: 'الأحماض والقواعد ومقياس الرقم الهيدروجيني pH', difficulty: 'hard' },
+  { id: 'chem3-redox', subject: 'الكيمياء', title: 'تفاعلات الأكسدة والاختزال ووزن المعادلات', difficulty: 'medium' },
+  { id: 'chem3-electro', subject: 'الكيمياء', title: 'الكيمياء الكهربائية (الخلايا الجلفانية والطلاء بالكهرباء)', difficulty: 'hard' }
+
     // أضف المزيد من الدروس هنا ...
   ];
 
@@ -371,6 +391,13 @@
     { id: 'math-test-01', title: 'اختبار الرياضيات (التفاضل)', date: '2026-09-06', duration: 20 },
     { id: 'arabic-test-01', title: 'اختبار اللغة العربية (النحو)', date: '2026-09-10', duration: 15 },
     { id: 'physics-test-01', title: 'اختبار الفيزياء (الحركة)', date: '2026-09-15', duration: 25 },
+      { id: 'test-chem1-mid', title: 'اختبار كيمياء 1 (الفترة الأولى)', date: '2026-09-15', duration: 20 },
+  { id: 'test-chem1-final-practical', title: 'الاختبار النهائي العملي (كيمياء 1)', date: '2026-10-05', duration: 30 },
+  { id: 'test-chem2-mid', title: 'اختبار كيمياء 2-2 (الفترة الأولى - الكيمياء الحرارية)', date: '2026-11-10', duration: 20 },
+  { id: 'test-chem2-final-theory', title: 'الاختبار النهائي النظري (كيمياء 2-2)', date: '2026-11-30', duration: 50 },
+  { id: 'test-chem3-practical', title: 'الاختبار النهائي العملي (كيمياء 3 - الأحماض والطلاء)', date: '2026-12-15', duration: 15 },
+  { id: 'test-chem3-final', title: 'الاختبار النهائي الشامل (كيمياء 3)', date: '2026-12-25', duration: 40 }
+
     // أضف اختبارات جديدة هنا ...
   ];
 
@@ -400,7 +427,48 @@
       name: '📘 5 دروس مكتملة',
       icon: 'fa-graduation-cap',
       condition: (user) => user.completedLessons.length >= 5
-    }
+    },
+    // شارة ترحيبية عند إكمال أول درس في المادة
+  'chem-welcome': {
+    name: '🏅 خطوة أولى في المختبر',
+    icon: 'fa-vial',
+    condition: (user) => user.completedLessons.length >= 1
+  },
+
+  // شارة مخصصة لإنهاء المستوى المتوسط وكتابة التوزيع الإلكتروني
+  'chem-intermediate': {
+    name: '⚛️ مستكشف الذرة والروابط',
+    icon: 'fa-atom',
+    condition: (user) => user.completedLessons.length >= 4
+  },
+
+  // شارة العبقرية الكيميائية عند إكمال جميع دروس المسار الـ 15 المذكورة أعلاه
+  'chem-master': {
+    name: '🧪 عبقري الكيمياء الشامل',
+    icon: 'fa-flask',
+    condition: (user) => user.completedLessons.length >= 15
+  },
+
+  // شارة مخصصة لحل الاختبارات العملية والنظرية بنجاح
+  'test-pioneer': {
+    name: '⚡ بطل الاختبارات والتحليلات الكيميائية',
+    icon: 'fa-graduation-cap',
+    condition: (user) => user.testResults.length >= 3
+  },
+
+  // شارة لتشجيع الطالب على المراجعة المستمرة دون انقطاع
+  'streak-hot': {
+    name: '🔥 تفاعل نشط ومستمر لـ 5 أيام متتالية',
+    icon: 'fa-fire',
+    condition: (user) => user.streak >= 5
+  },
+
+  // شارة مخصصة لتجميع النقاط العالية من المسائل الحسابية الصعبة في المول والـ pH والتغير الحراري
+  'points-elite': {
+    name: '💎 النخبة الكيميائية (1500 نقطة)',
+    icon: 'fa-gem',
+    condition: (user) => user.points >= 1500
+  }
   };
 
   // ============================================================
