@@ -573,6 +573,7 @@ function editProfile() {
 }
 function closeWelcomeModal() { document.getElementById('welcomeModal').classList.remove('active'); }
 
+// تعديل دالة resetProgress لإزالة alert غير ضروري
 function resetProgress() {
   if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
     const old = loadUser();
@@ -582,21 +583,27 @@ function resetProgress() {
     saveUser(def);
     renderHome();
     updateHeader();
+    alert('✅ تم إعادة تعيين التقدم بنجاح!');
   }
 }
 
+// تعديل دالة addSampleData لإزالة alert غير ضروري
 function addSampleData() {
   const user = loadUser();
   const stageLessons = getLessonsForStage(user.stage);
   const sampleIds = stageLessons.slice(0, 3).map(l => l.id);
   let added = 0;
   sampleIds.forEach(id => {
-    if (!user.completedLessons.includes(id)) { user.completedLessons.push(id); user.points = (user.points || 0) + 10; added++; }
+    if (!user.completedLessons.includes(id)) { 
+      user.completedLessons.push(id); 
+      user.points = (user.points || 0) + 10; 
+      added++; 
+    }
   });
   saveUser(user);
   renderHome();
   updateHeader();
-  alert(`تمت إضافة ${added} دروس نموذجية!`);
+  alert(`✅ تمت إضافة ${added} دروس نموذجية!`);
 }
 
 function updateHeader() {
