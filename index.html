@@ -38,8 +38,8 @@
   <!-- مودال الترحيب (يظهر لأول مرة) -->
   <div class="modal-overlay" id="welcomeModal">
     <div class="modal-box">
-      <h2>مرحباً بك في مساعد النجاح</h2>
-      <p>أخبرنا عن نفسك لنخصص لك التجربة</p>
+      <h2 id="welcomeTitle">مرحباً بك في مساعد النجاح</h2>
+      <p id="welcomeSub">أخبرنا عن نفسك لنخصص لك التجربة</p>
       <label>الاسم</label>
       <input type="text" id="inputName" placeholder="اكتب اسمك" />
       <label>المرحلة الدراسية</label>
@@ -59,10 +59,7 @@
     </div>
   </div>
 
-  <!-- تحميل البيانات والجافاسكريبت -->
-  <script src="data/subjects.json"></script>
-  <script src="data/lessons.json"></script>
-  <script src="data/tests.json"></script>
+  <!-- تحميل الجافاسكريبت (الملفات منفصلة) -->
   <script src="js/storage.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/pages/home.js"></script>
