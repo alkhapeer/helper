@@ -1,15 +1,14 @@
 [
-    { "id": "math", "name": "الرياضيات", "stage": "ابتدائي", "icon": "fa-calculator" },
-    { "id": "math-prep", "name": "الرياضيات", "stage": "اعدادي", "icon": "fa-calculator" },
-    { "id": "math-sec", "name": "الرياضيات", "stage": "ثانوي", "icon": "fa-calculator" },
-    { "id": "arabic", "name": "اللغة العربية", "stage": "ابتدائي", "icon": "fa-book" },
-    { "id": "arabic-prep", "name": "اللغة العربية", "stage": "اعدادي", "icon": "fa-book" },
-    { "id": "arabic-sec", "name": "اللغة العربية", "stage": "ثانوي", "icon": "fa-book" },
-    { "id": "science", "name": "العلوم", "stage": "ابتدائي", "icon": "fa-flask" },
-    { "id": "physics", "name": "الفيزياء", "stage": "اعدادي", "icon": "fa-atom" },
-    { "id": "chemistry", "name": "الكيمياء", "stage": "اعدادي", "icon": "fa-vial" },
-    { "id": "biology", "name": "الأحياء", "stage": "اعدادي", "icon": "fa-dna" },
-    { "id": "physics-sec", "name": "الفيزياء", "stage": "ثانوي", "icon": "fa-atom" },
-    { "id": "chemistry-sec", "name": "الكيمياء", "stage": "ثانوي", "icon": "fa-vial" },
-    { "id": "biology-sec", "name": "الأحياء", "stage": "ثانوي", "icon": "fa-dna" }
+  { "id": "math", "name": "رياضيات", "stage": "ابتدائي" },
+  { "id": "arabic", "name": "لغة عربية", "stage": "ابتدائي" },
+  { "id": "science", "name": "علوم", "stage": "ابتدائي" },
+  { "id": "math-prep", "name": "رياضيات", "stage": "اعدادي" },
+  { "id": "physics-prep", "name": "فيزياء", "stage": "اعدادي" },
+  { "id": "chem-prep", "name": "كيمياء", "stage": "اعدادي" },
+  { "id": "verbal", "name": "لفظي", "stage": "ثانوي", "category": "قدرات" },
+  { "id": "quant", "name": "كمي", "stage": "ثانوي", "category": "قدرات" },
+  { "id": "math-sec", "name": "رياضيات", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "physics-sec", "name": "فيزياء", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "chemistry-sec", "name": "كيمياء", "stage": "ثانوي", "category": "تحصيلي" },
+  { "id": "biology-sec", "name": "أحياء", "stage": "ثانوي", "category": "تحصيلي" }
 ]
