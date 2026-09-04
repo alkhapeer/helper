@@ -1,64 +1,96 @@
 function renderTrain() {
-    const user = loadUser();
-    const container = document.getElementById('page-container');
-    const subjects = getSubjectsForStage(user.stage || 'all');
-    let html = `
-        <div class="page active" id="page-train">
-            <div class="stage-selector">
-                <button class="stage-btn ${user.stage === 'all' ? 'active' : ''}" data-stage="all">الكل</button>
-                <button class="stage-btn ${user.stage === 'ابتدائي' ? 'active' : ''}" data-stage="ابتدائي">ابتدائي</button>
-                <button class="stage-btn ${user.stage === 'اعدادي' ? 'active' : ''}" data-stage="اعدادي">اعدادي</button>
-                <button class="stage-btn ${user.stage === 'ثانوي' ? 'active' : ''}" data-stage="ثانوي">ثانوي</button>
-            </div>
-            <div id="subjectFilter" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
-                <button class="subject-chip ${!user.selectedSubject ? 'active' : ''}" data-subject="all">الكل</button>
-                ${subjects.map(s => `<button class="subject-chip ${user.selectedSubject === s.id ? 'active' : ''}" data-subject="${s.id}">${s.name}</button>`).join('')}
-            </div>
-            <div id="lessonsList">
-                ${renderLessonsList(user, subjects)}
-            </div>
-        </div>
+  const user = loadUser();
+  const container = document.getElementById('page-container');
+  const subjects = getSubjectsForStage(user.stage);
+  const categories = getCategoriesForStage(user.stage);
+  
+  let html = `
+    <div class="page active" id="page-train">
+  `;
+
+  // عرض الأقسام (للثانوي فقط)
+  if (categories.length > 0) {
+    html += `
+      <div class="category-tabs">
+        ${categories.map(cat => `
+          <button class="category-tab ${user.selectedCategory === cat ? 'active' : ''}" data-category="${cat}">
+            ${cat === 'قدرات' ? '🎯 قدرات' : '📚 تحصيلي'}
+          </button>
+        `).join('')}
+      </div>
     `;
-    container.innerHTML = html;
+  }
 
-    // أحداث الأزرار
-    container.querySelectorAll('.stage-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            user.stage = this.dataset.stage;
-            user.selectedSubject = null;
-            saveUser(user);
-            renderTrain();
-        });
-    });
-    container.querySelectorAll('.subject-chip').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const subjectId = this.dataset.subject;
-            user.selectedSubject = subjectId === 'all' ? null : subjectId;
-            saveUser(user);
-            renderTrain();
-        });
-    });
-}
+  // عرض المواد حسب القسم المختار
+  let filteredSubjects = subjects;
+  if (user.selectedCategory) {
+    filteredSubjects = subjects.filter(s => s.category === user.selectedCategory);
+  }
 
-function renderLessonsList(user, subjects) {
-    let lessons = [];
-    if (user.selectedSubject) {
-        lessons = LESSONS.filter(l => l.subjectId === user.selectedSubject);
-    } else {
-        const subjectIds = subjects.map(s => s.id);
-        lessons = LESSONS.filter(l => subjectIds.includes(l.subjectId));
-    }
-    if (!lessons.length) return '<div class="text-muted">لا توجد دروس للمادة المختارة.</div>';
+  html += `
+    <div class="subject-tabs">
+      <button class="subject-tab ${!user.selectedSubject ? 'active' : ''}" data-subject="all">الكل</button>
+      ${filteredSubjects.map(s => `
+        <button class="subject-tab ${user.selectedSubject === s.id ? 'active' : ''}" data-subject="${s.id}">
+          ${s.name}
+        </button>
+      `).join('')}
+    </div>
+    <div id="lessonsList">
+  `;
+
+  // عرض الدروس
+  let lessons = getLessonsForStage(user.stage);
+  if (user.selectedCategory) {
+    const subjectIds = filteredSubjects.map(s => s.id);
+    lessons = lessons.filter(l => subjectIds.includes(l.subjectId));
+  }
+  if (user.selectedSubject) {
+    lessons = lessons.filter(l => l.subjectId === user.selectedSubject);
+  }
+
+  if (lessons.length === 0) {
+    html += `<div class="text-muted">لا توجد دروس للمادة المختارة.</div>`;
+  } else {
     const completedIds = new Set(user.completedLessons);
-    return lessons.map(lesson => `
+    lessons.forEach(lesson => {
+      const isCompleted = completedIds.has(lesson.id);
+      const diff = lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم';
+      const subjectName = SUBJECTS.find(s => s.id === lesson.subjectId)?.name || '';
+      html += `
         <div class="lesson-item">
-            <div class="info">
-                <div class="title">${lesson.title}</div>
-                <div class="sub">${lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم'} • ${SUBJECTS.find(s=>s.id===lesson.subjectId)?.name || ''}</div>
-            </div>
-            <div class="actions">
-                ${completedIds.has(lesson.id) ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : `<button class="btn btn-sm" onclick="openLesson('${lesson.id}')">بدء الدراسة</button>`}
-            </div>
+          <div class="info">
+            <div class="title">${lesson.title}</div>
+            <div class="sub">${diff} • ${subjectName}</div>
+          </div>
+          <div class="actions">
+            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : 
+              `<button class="btn btn-sm" onclick="openLesson('${lesson.id}')">بدء الدراسة</button>`}
+          </div>
         </div>
-    `).join('');
+      `;
+    });
+  }
+
+  html += `</div></div>`;
+  container.innerHTML = html;
+
+  // ربط الأحداث
+  container.querySelectorAll('.category-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      user.selectedCategory = this.dataset.category;
+      user.selectedSubject = null;
+      saveUser(user);
+      renderTrain();
+    });
+  });
+
+  container.querySelectorAll('.subject-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const subjectId = this.dataset.subject;
+      user.selectedSubject = subjectId === 'all' ? null : subjectId;
+      saveUser(user);
+      renderTrain();
+    });
+  });
 }
