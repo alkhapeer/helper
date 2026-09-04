@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مركز التحكم الشخصي</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #f4f7fc;
+      padding: 20px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .app {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      padding: 24px 20px 30px;
+    }
+    /* header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a2b4a;
+    }
+    .header h1 span {
+      color: #5b7cfa;
+    }
+    .header .user {
+      background: #eef2f9;
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a2b4a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header .user i {
+      font-size: 18px;
+      color: #5b7cfa;
+    }
+    /* card */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 18px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.04);
+      border: 1px solid #e9edf4;
+      transition: 0.2s;
+    }
+    .card:active {
+      transform: scale(0.98);
+    }
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a2b4a;
+      margin-bottom: 12px;
+    }
+    .card-title i {
+      color: #5b7cfa;
+      margin-left: 8px;
+    }
+    .card-title .badge {
+      background: #eef2f9;
+      border-radius: 30px;
+      padding: 2px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #3a4b6a;
+    }
+    /* progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #e9edf4;
+      border-radius: 20px;
+      margin: 8px 0 4px;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #5b7cfa, #8aa3ff);
+      width: 0%;
+    }
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .flex-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat {
+      font-size: 14px;
+      color: #3a4b6a;
+    }
+    .stat strong {
+      font-weight: 700;
+      color: #1a2b4a;
+    }
+    .highlight {
+      background: #f0f4fe;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 6px;
+    }
+    /* list tasks */
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .task-item:last-child {
+      border-bottom: none;
+    }
+    .task-item .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .task-item .left i {
+      color: #5b7cfa;
+      width: 20px;
+    }
+    .task-item .left .done {
+      color: #34c759;
+    }
+    .task-item .left .pending {
+      color: #ff9500;
+    }
+    .task-item .time {
+      font-size: 13px;
+      color: #8a9bb5;
+    }
+    .weak-topic {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed #eef2f9;
+    }
+    .weak-topic .score {
+      font-weight: 600;
+    }
+    .weak-topic .score.low {
+      color: #ff3b30;
+    }
+    .weak-topic .score.mid {
+      color: #ff9500;
+    }
+    .recommend {
+      background: #f8faff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 6px;
+      border-right: 4px solid #5b7cfa;
+      font-size: 14px;
+      color: #1a2b4a;
+    }
+    .recommend i {
+      color: #5b7cfa;
+      margin-left: 8px;
+    }
+    .achievement-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f8faff;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a2b4a;
+      margin-left: 8px;
+      margin-bottom: 6px;
+      border: 1px solid #e9edf4;
+    }
+    .achievement-badge i {
+      color: #fbbf24;
+    }
+    .btn {
+      background: #5b7cfa;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #5b7cfa;
+      color: #5b7cfa;
+    }
+    .mt-2 { margin-top: 12px; }
+    .mb-1 { margin-bottom: 6px; }
+    .text-center { text-align: center; }
+    .text-muted { color: #8a9bb5; font-size: 14px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .divider {
+      height: 1px;
+      background: #e9edf4;
+      margin: 12px 0;
+    }
+    /* responsive */
+    @media (max-width: 400px) {
+      .app { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>مرحباً، <span id="userName">أحمد</span></h1>
+    <div class="user"><i class="fas fa-user-circle"></i> <span id="userPoints">0</span> نقطة</div>
+  </div>
+
+  <!-- ========== الهدف والتقدم العام ========== -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fas fa-bullseye"></i> هدفي</span>
+      <span class="badge" id="goalDisplay">90%</span>
+    </div>
+    <div class="flex-row">
+      <span class="stat">التقدم العام</span>
+      <span class="stat" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+    <div class="flex-row mt-2">
+      <span class="stat"><i class="fas fa-check-circle" style="color:#34c759;"></i> <span id="completedLessons">0</span> درس مكتمل</span>
+      <span class="stat">من <span id="totalLessons">0</span></span>
+    </div>
+  </div>
+
+  <!-- ========== الخطة اليومية ========== -->
+  <div class="card" onclick="goTo('plan')">
+    <div class="card-title">
+      <span><i class="fas fa-calendar-day"></i> خطتي اليوم</span>
+      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
+    </div>
+    <div id="dailyPlanContainer">
+      <!-- سيتم ملؤها بـ JS -->
+      <div class="text-muted">لا توجد مهام حالياً</div>
+    </div>
+  </div>
+
+  <!-- ========== نقاط الضعف ========== -->
+  <div class="card" onclick="goTo('weak')">
+    <div class="card-title">
+      <span><i class="fas fa-exclamation-triangle" style="color:#ff9500;"></i> نقاط الضعف</span>
+      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
+    </div>
+    <div id="weakTopicsContainer">
+      <div class="text-muted">لا توجد نقاط ضعف مسجلة</div>
+    </div>
+  </div>
+
+  <!-- ========== الاختبار القادم ========== -->
+  <div class="card" onclick="goTo('test')">
+    <div class="card-title">
+      <span><i class="fas fa-clock"></i> الاختبار القادم</span>
+      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
+    </div>
+    <div id="nextTestContainer">
+      <div class="text-muted">لا توجد اختبارات قادمة</div>
+    </div>
+  </div>
+
+  <!-- ========== الإنجازات ========== -->
+  <div class="card" onclick="goTo('achievements')">
+    <div class="card-title">
+      <span><i class="fas fa-trophy" style="color:#fbbf24;"></i> إنجازاتي</span>
+      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
+    </div>
+    <div id="achievementsContainer">
+      <span class="text-muted">لا توجد إنجازات بعد</span>
+    </div>
+  </div>
+
+  <!-- ========== التوصيات ========== -->
+  <div class="card" onclick="goTo('recommend')">
+    <div class="card-title">
+      <span><i class="fas fa-lightbulb" style="color:#5b7cfa;"></i> توصيات لك</span>
+      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
+    </div>
+    <div id="recommendationsContainer">
+      <div class="text-muted">توصيات مخصصة ستظهر هنا</div>
+    </div>
+  </div>
+
+  <!-- ========== زر إعادة تعيين / تصدير ========== -->
+  <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
+    <button class="btn btn-outline" onclick="resetProgress()" style="flex:1;"><i class="fas fa-undo"></i> إعادة تعيين</button>
+    <button class="btn" onclick="addSampleData()" style="flex:1;"><i class="fas fa-plus"></i> إضافة بيانات نموذجية</button>
+  </div>
+  <div class="text-muted text-center" style="font-size:12px; margin-top:12px;">
+    <i class="fas fa-database"></i> بياناتك محفوظة محلياً في متصفحك
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // 1. تعريف البيانات الأساسية (الدروس، الاختبارات، الإنجازات)
+  //    هذه هي الأماكن التي يمكنك فيها إضافة محتوى جديد بسهولة
+  // ============================================================
+
+  // --- دروس (مقررات) ---
+  // يمكنك إضافة دروس جديدة هنا، أو استيرادها من JSON.
+  // المفتاح: يجب أن يكون id فريداً.
+  const LESSONS_DATA = [
+    { id: 'math-01', subject: 'الرياضيات', title: 'الدوال', difficulty: 'medium' },
+    { id: 'math-02', subject: 'الرياضيات', title: 'التفاضل', difficulty: 'hard' },
+    { id: 'math-03', subject: 'الرياضيات', title: 'المعادلات', difficulty: 'medium' },
+    { id: 'arabic-01', subject: 'اللغة العربية', title: 'النحو', difficulty: 'easy' },
+    { id: 'arabic-02', subject: 'اللغة العربية', title: 'البلاغة', difficulty: 'medium' },
+    { id: 'physics-01', subject: 'الفيزياء', title: 'الحركة', difficulty: 'hard' },
+    { id: 'physics-02', subject: 'الفيزياء', title: 'القوى', difficulty: 'medium' },
+    { id: 'english-01', subject: 'اللغة الإنجليزية', title: 'المحادثة', difficulty: 'easy' },
+    // أضف المزيد من الدروس هنا ...
+  ];
+
+  // --- اختبارات ---
+  // يمكنك إضافة اختبارات جديدة هنا مع تاريخها.
+  const TESTS_DATA = [
+    { id: 'math-test-01', title: 'اختبار الرياضيات (التفاضل)', date: '2026-09-06', duration: 20 },
+    { id: 'arabic-test-01', title: 'اختبار اللغة العربية (النحو)', date: '2026-09-10', duration: 15 },
+    { id: 'physics-test-01', title: 'اختبار الفيزياء (الحركة)', date: '2026-09-15', duration: 25 },
+    // أضف اختبارات جديدة هنا ...
+  ];
+
+  // --- تعريف الإنجازات (القواعد) ---
+  // المفتاح: معرف الإنجاز، value: { name, icon, condition: function(user) }
+  const ACHIEVEMENT_DEFS = {
+    'first-lesson': {
+      name: 'أول درس',
+      icon: 'fa-book-open',
+      condition: (user) => user.completedLessons.length >= 1
+    },
+    'first-test': {
+      name: 'أول اختبار',
+      icon: 'fa-check-circle',
+      condition: (user) => user.testResults.length >= 1
+    },
+    'points-1000': {
+      name: '⭐ 1000 نقطة',
+      icon: 'fa-star',
+      condition: (user) => user.points >= 1000
+    },
+    'seven-days': {
+      name: '🔥 7 أيام متتالية',
+      icon: 'fa-fire',
+      condition: (user) => user.streak >= 7   // سنحاكي streak
+    },
+    'five-lessons': {
+      name: '📘 5 دروس مكتملة',
+      icon: 'fa-graduation-cap',
+      condition: (user) => user.completedLessons.length >= 5
+    }
+  };
+
+  // ============================================================
+  // 2. إدارة localStorage
+  // ============================================================
+  const STORAGE_KEY = 'hero_user';
+
+  function getDefaultUser() {
+    return {
+      name: 'أحمد',
+      goal: 90,
+      points: 0,
+      completedLessons: [],
+      testResults: [],      // [{testId, score}]
+      achievements: [],     // list of achievement keys
+      streak: 0,
+      lastActive: null,
+      // يمكن إضافة حقول أخرى حسب الرغبة
+    };
+  }
+
+  function loadUser() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        // دمج مع default للتأكد من وجود كل الخصائص
+        const def = getDefaultUser();
+        for (let key in def) {
+          if (!(key in data)) data[key] = def[key];
+        }
+        return data;
+      }
+    } catch (e) { console.warn('Error loading user', e); }
+    return getDefaultUser();
+  }
+
+  function saveUser(user) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+  }
+
+  // ============================================================
+  // 3. الوظائف الأساسية لحساب التقدم، نقاط الضعف، الخطة، إلخ.
+  // ============================================================
+
+  function getUserStats(user) {
+    const total = LESSONS_DATA.length;
+    const completed = user.completedLessons.length;
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, progress };
+  }
+
+  // نقاط الضعف: بناءً على نتائج الاختبارات
+  function getWeakTopics(user) {
+    // نقوم بتجميع الدرجات حسب الموضوع (نستخدم جزء من اسم الاختبار)
+    const map = {};
+    user.testResults.forEach(tr => {
+      // نبحث عن الاختبار في TESTS_DATA لنأخذ عنوانه
+      const testDef = TESTS_DATA.find(t => t.id === tr.testId);
+      if (!testDef) return;
+      // نستخرج الموضوع من العنوان (مثلاً "الرياضيات" من "اختبار الرياضيات")
+      let subject = 'عام';
+      const match = testDef.title.match(/اختبار (.+?)[ \(]/);
+      if (match) subject = match[1];
+      if (!map[subject]) map[subject] = [];
+      map[subject].push(tr.score);
+    });
+    const weak = [];
+    for (let sub in map) {
+      const scores = map[sub];
+      const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+      if (avg < 70) {
+        weak.push({ subject: sub, score: Math.round(avg) });
+      }
+    }
+    weak.sort((a,b) => a.score - b.score);
+    return weak;
+  }
+
+  // الخطة اليومية: تعتمد على الدروس غير المكتملة + نقاط الضعف + اختبار قادم
+  function generateDailyPlan(user) {
+    const tasks = [];
+    const completedIds = new Set(user.completedLessons);
+    const notCompleted = LESSONS_DATA.filter(lesson => !completedIds.has(lesson.id));
+
+    // 1. إذا كان هناك نقاط ضعف، نوصي بدرس من نفس المادة
+    const weak = getWeakTopics(user);
+    if (weak.length > 0) {
+      const weakSub = weak[0].subject;
+      const found = notCompleted.find(l => l.subject.includes(weakSub));
+      if (found) {
+        tasks.push({ 
+          text: `مراجعة ${found.title} (${found.subject})`, 
+          time: '30 دقيقة',
+          done: false,
+          icon: 'fa-book'
+        });
+      } else {
+        // إذا لم نجد درساً، نضيف توصية عامة
+        tasks.push({ text: `مراجعة ${weakSub}`, time: '30 دقيقة', done: false, icon: 'fa-pen' });
+      }
+    } else {
+      // إذا لم توجد نقاط ضعف، نأخذ أول درس غير مكتمل
+      if (notCompleted.length > 0) {
+        const l = notCompleted[0];
+        tasks.push({ text: `دراسة ${l.title} (${l.subject})`, time: '45 دقيقة', done: false, icon: 'fa-graduation-cap' });
+      }
+    }
+
+    // 2. اختبار قادم؟
+    const nextTest = getNextTest(user);
+    if (nextTest) {
+      tasks.push({ text: `مراجعة لـ ${nextTest.title}`, time: '20 دقيقة', done: false, icon: 'fa-clock' });
+    }
+
+    // 3. إضافة تدريب إضافي إذا كان هناك وقت
+    if (tasks.length < 2) {
+      tasks.push({ text: 'حل تمارين عامة', time: '15 دقيقة', done: false, icon: 'fa-puzzle-piece' });
+    }
+
+    // تحديد حالة الإنجاز (محاكاة أن بعض المهام قد أنجزت)
+    // في الواقع يمكن ربطها ببيانات المستخدم، لكننا نجعل أول مهمة مكتملة مثلاً
+    if (tasks.length > 0) {
+      // نحدد أول مهمة كـ "منجزة" إذا كان المستخدم لديه دروس مكتملة
+      if (user.completedLessons.length > 0) {
+        tasks[0].done = true;
+      }
+    }
+
+    return tasks;
+  }
+
+  // الاختبار القادم: أقرب اختبار لم يتم حله بعد
+  function getNextTest(user) {
+    const solvedIds = new Set(user.testResults.map(r => r.testId));
+    const now = new Date();
+    const future = TESTS_DATA
+      .filter(t => !solvedIds.has(t.id))
+      .filter(t => new Date(t.date) >= now)
+      .sort((a,b) => new Date(a.date) - new Date(b.date));
+    return future.length > 0 ? future[0] : null;
+  }
+
+  // حساب الإنجازات المفتوحة
+  function computeAchievements(user) {
+    const unlocked = [];
+    for (let key in ACHIEVEMENT_DEFS) {
+      const def = ACHIEVEMENT_DEFS[key];
+      if (def.condition(user) && !user.achievements.includes(key)) {
+        unlocked.push(key);
+      }
+    }
+    // إضافة ما هو موجود بالفعل
+    const all = [...new Set([...user.achievements, ...unlocked])];
+    return all;
+  }
+
+  // التوصيات الذكية
+  function getRecommendations(user) {
+    const recs = [];
+    const weak = getWeakTopics(user);
+    if (weak.length > 0) {
+      weak.forEach(w => {
+        if (w.score < 60) {
+          recs.push(`💡 ركز اليوم على "${w.subject}"، نتيجتك الحالية ${w.score}%.`);
+        } else if (w.score < 75) {
+          recs.push(`💡 تحتاج إلى تدريب إضافي في "${w.subject}" (${w.score}%).`);
+        }
+      });
+    }
+    const next = getNextTest(user);
+    if (next) {
+      const days = Math.ceil((new Date(next.date) - new Date()) / (1000*60*60*24));
+      if (days <= 2) {
+        recs.push(`💡 لديك اختبار "${next.title}" بعد ${days} يوم، ابدأ المراجعة.`);
+      }
+    }
+    if (user.completedLessons.length === 0 && LESSONS_DATA.length > 0) {
+      recs.push('💡 ابدأ بأول درس اليوم لتكسب نقاطاً.');
+    }
+    if (recs.length === 0) {
+      recs.push('💡 أداؤك ممتاز! واصل بنفس الوتيرة.');
+    }
+    return recs.slice(0, 3);
+  }
+
+  // ============================================================
+  // 4. تحديث واجهة المستخدم
+  // ============================================================
+
+  function renderDashboard() {
+    const user = loadUser();
+    // تحديث الاسم والنقاط
+    document.getElementById('userName').textContent = user.name || 'أحمد';
+    document.getElementById('userPoints').textContent = user.points || 0;
+
+    // التقدم
+    const stats = getUserStats(user);
+    document.getElementById('goalDisplay').textContent = `${user.goal || 90}%`;
+    document.getElementById('progressPercent').textContent = `${stats.progress}%`;
+    document.getElementById('progressFill').style.width = `${Math.min(stats.progress, 100)}%`;
+    document.getElementById('completedLessons').textContent = stats.completed;
+    document.getElementById('totalLessons').textContent = stats.total;
+
+    // الخطة اليومية
+    const plan = generateDailyPlan(user);
+    const planContainer = document.getElementById('dailyPlanContainer');
+    if (plan.length === 0) {
+      planContainer.innerHTML = `<div class="text-muted">لا توجد مهام حالياً</div>`;
+    } else {
+      planContainer.innerHTML = plan.map((task, idx) => `
+        <div class="task-item">
+          <div class="left">
+            <i class="fas ${task.icon} ${task.done ? 'done' : 'pending'}"></i>
+            <span style="${task.done ? 'text-decoration:line-through; color:#8a9bb5;' : ''}">${task.text}</span>
+          </div>
+          <span class="time">${task.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // نقاط الضعف
+    const weak = getWeakTopics(user);
+    const weakContainer = document.getElementById('weakTopicsContainer');
+    if (weak.length === 0) {
+      weakContainer.innerHTML = `<div class="text-muted">🎉 لا توجد نقاط ضعف، أداؤك جيد!</div>`;
+    } else {
+      weakContainer.innerHTML = weak.map(w => `
+        <div class="weak-topic">
+          <span>${w.subject}</span>
+          <span class="score ${w.score < 60 ? 'low' : 'mid'}">${w.score}%</span>
+        </div>
+      `).join('');
+    }
+
+    // الاختبار القادم
+    const nextTest = getNextTest(user);
+    const testContainer = document.getElementById('nextTestContainer');
+    if (nextTest) {
+      const days = Math.ceil((new Date(nextTest.date) - new Date()) / (1000*60*60*24));
+      testContainer.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>${nextTest.title}</strong>
+            <div class="text-muted" style="font-size:13px;">${days > 0 ? `بعد ${days} يوم` : 'اليوم'}</div>
+          </div>
+          <span class="badge">${nextTest.duration} دقيقة</span>
+        </div>
+        <div style="margin-top:8px;"><button class="btn" onclick="event.stopPropagation(); alert('بدء الاختبار: ${nextTest.title}')" style="padding:6px 16px;font-size:13px;">ابدأ الاختبار</button></div>
+      `;
+    } else {
+      testContainer.innerHTML = `<div class="text-muted">✅ لا توجد اختبارات قادمة</div>`;
+    }
+
+    // الإنجازات
+    const allAchievements = computeAchievements(user);
+    // حفظ الإنجازات الجديدة
+    if (allAchievements.length > user.achievements.length) {
+      user.achievements = allAchievements;
+      saveUser(user);
+    }
+    const achContainer = document.getElementById('achievementsContainer');
+    if (allAchievements.length === 0) {
+      achContainer.innerHTML = `<span class="text-muted">لا توجد إنجازات بعد</span>`;
+    } else {
+      achContainer.innerHTML = allAchievements.map(key => {
+        const def = ACHIEVEMENT_DEFS[key];
+        if (!def) return '';
+        return `<span class="achievement-badge"><i class="fas ${def.icon}"></i> ${def.name}</span>`;
+      }).join('');
+    }
+
+    // التوصيات
+    const recs = getRecommendations(user);
+    const recContainer = document.getElementById('recommendationsContainer');
+    if (recs.length === 0) {
+      recContainer.innerHTML = `<div class="text-muted">لا توجد توصيات خاصة</div>`;
+    } else {
+      recContainer.innerHTML = recs.map(r => `<div class="recommend"><i class="fas fa-lightbulb"></i> ${r}</div>`).join('');
+    }
+  }
+
+  // ============================================================
+  // 5. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
+  // ============================================================
+
+  function resetProgress() {
+    if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
+      const def = getDefaultUser();
+      saveUser(def);
+      renderDashboard();
+    }
+  }
+
+  function addSampleData() {
+    const user = loadUser();
+    // إضافة بعض الدروس المكتملة
+    const sampleLessons = ['math-01', 'math-03', 'arabic-01', 'physics-02'];
+    sampleLessons.forEach(id => {
+      if (!user.completedLessons.includes(id)) {
+        user.completedLessons.push(id);
+      }
+    });
+    // إضافة نتائج اختبارات
+    const sampleResults = [
+      { testId: 'math-test-01', score: 55 },
+      { testId: 'arabic-test-01', score: 62 },
+      { testId: 'physics-test-01', score: 88 },
+    ];
+    sampleResults.forEach(sr => {
+      if (!user.testResults.find(r => r.testId === sr.testId)) {
+        user.testResults.push(sr);
+      }
+    });
+    // نقاط
+    user.points = Math.max(user.points, 450);
+    // streak
+    user.streak = Math.max(user.streak, 3);
+    saveUser(user);
+    renderDashboard();
+    alert('تمت إضافة بيانات نموذجية!');
+  }
+
+  // محاكاة التنقل (في تطبيق حقيقي ستنتقل إلى صفحات أخرى)
+  function goTo(section) {
+    alert(`سيتم الانتقال إلى صفحة: ${section} (يمكنك تنفيذها لاحقاً)`);
+  }
+
+  // ============================================================
+  // 6. التشغيل الأولي
+  // ============================================================
+
+  // التأكد من وجود مستخدم، وإنشاء افتراضي إذا لم يكن موجوداً
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    const def = getDefaultUser();
+    // نضيف بعض البيانات الأولية لتجربة أفضل
+    def.name = 'إبراهيم';
+    def.points = 120;
+    def.completedLessons = ['math-01', 'arabic-01'];
+    def.testResults = [{ testId: 'math-test-01', score: 45 }];
+    def.streak = 2;
+    saveUser(def);
+  }
+
+  renderDashboard();
+
+  // يمكن إعادة الرسم كل دقيقة (للتحديث التلقائي)
+  // لكننا نكتفي بالتحديث عند التفاعل.
+</script>
+</body>
+</html>
