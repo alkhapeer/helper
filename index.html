@@ -4,255 +4,69 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مركز التحكم الشخصي</title>
-  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background: #f4f7fc;
-      padding: 20px;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-    .app {
-      background: white;
-      border-radius: 28px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      padding: 24px 20px 30px;
-    }
-    /* header */
-    .header {
+    /* جميع الأنماط السابقة تبقى كما هي، نضيف فقط أنماط جديدة للدروس */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+    body { background:#f4f7fc; padding:20px; max-width:480px; margin:0 auto; }
+    .app { background:white; border-radius:28px; box-shadow:0 10px 30px rgba(0,0,0,0.05); padding:24px 20px 30px; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+    .header h1 { font-size:22px; font-weight:700; color:#1a2b4a; }
+    .header h1 span { color:#5b7cfa; }
+    .header .user { background:#eef2f9; border-radius:40px; padding:8px 16px; font-size:14px; font-weight:600; color:#1a2b4a; display:flex; align-items:center; gap:8px; }
+    .header .user i { font-size:18px; color:#5b7cfa; }
+    .clickable-name { cursor:pointer; border-bottom:2px dashed #5b7cfa; transition:0.2s; }
+    .clickable-name:hover { background:#e0e8ff; border-radius:6px; padding:0 4px; }
+    .card { background:#ffffff; border-radius:20px; padding:18px 16px; margin-bottom:16px; box-shadow:0 4px 12px rgba(0,20,40,0.04); border:1px solid #e9edf4; transition:0.2s; }
+    .card:active { transform:scale(0.98); }
+    .card-title { display:flex; justify-content:space-between; align-items:center; font-size:16px; font-weight:700; color:#1a2b4a; margin-bottom:12px; }
+    .card-title i { color:#5b7cfa; margin-left:8px; }
+    .card-title .badge { background:#eef2f9; border-radius:30px; padding:2px 12px; font-size:12px; font-weight:500; color:#3a4b6a; }
+    .progress-bar { width:100%; height:10px; background:#e9edf4; border-radius:20px; margin:8px 0 4px; }
+    .progress-bar .fill { height:100%; border-radius:20px; background:linear-gradient(90deg,#5b7cfa,#8aa3ff); width:0%; }
+    .flex-row { display:flex; justify-content:space-between; align-items:center; }
+    .stat { font-size:14px; color:#3a4b6a; }
+    .task-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f4f8; }
+    .task-item:last-child { border-bottom:none; }
+    .task-item .left { display:flex; align-items:center; gap:10px; }
+    .task-item .left i { color:#5b7cfa; width:20px; }
+    .task-item .left .done { color:#34c759; }
+    .task-item .left .pending { color:#ff9500; }
+    .task-item .time { font-size:13px; color:#8a9bb5; }
+    .weak-topic { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eef2f9; }
+    .weak-topic .score { font-weight:600; }
+    .weak-topic .score.low { color:#ff3b30; }
+    .weak-topic .score.mid { color:#ff9500; }
+    .recommend { background:#f8faff; padding:10px 14px; border-radius:14px; margin-bottom:6px; border-right:4px solid #5b7cfa; font-size:14px; color:#1a2b4a; }
+    .recommend i { color:#5b7cfa; margin-left:8px; }
+    .achievement-badge { display:inline-flex; align-items:center; gap:4px; background:#f8faff; padding:6px 14px; border-radius:30px; font-size:13px; font-weight:500; color:#1a2b4a; margin-left:8px; margin-bottom:6px; border:1px solid #e9edf4; }
+    .achievement-badge i { color:#fbbf24; }
+    .btn { background:#5b7cfa; color:white; border:none; padding:10px 20px; border-radius:40px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; }
+    .btn:active { transform:scale(0.95); }
+    .btn-outline { background:transparent; border:1px solid #5b7cfa; color:#5b7cfa; }
+    .btn-success { background:#34c759; }
+    .mt-2 { margin-top:12px; }
+    .text-muted { color:#8a9bb5; font-size:14px; }
+    .text-center { text-align:center; }
+    .divider { height:1px; background:#e9edf4; margin:12px 0; }
+
+    /* أنماط قائمة الدروس */
+    .lesson-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-    }
-    .header h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #1a2b4a;
-    }
-    .header h1 span {
-      color: #5b7cfa;
-    }
-    .header .user {
-      background: #eef2f9;
-      border-radius: 40px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #1a2b4a;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .header .user i {
-      font-size: 18px;
-      color: #5b7cfa;
-    }
-    /* clickable name */
-    .clickable-name {
-      cursor: pointer;
-      border-bottom: 2px dashed #5b7cfa;
-      transition: 0.2s;
-    }
-    .clickable-name:hover {
-      background: #e0e8ff;
-      border-radius: 6px;
-      padding: 0 4px;
-    }
-    /* card */
-    .card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 18px 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(0, 20, 40, 0.04);
-      border: 1px solid #e9edf4;
-      transition: 0.2s;
-    }
-    .card:active {
-      transform: scale(0.98);
-    }
-    .card-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a2b4a;
-      margin-bottom: 12px;
-    }
-    .card-title i {
-      color: #5b7cfa;
-      margin-left: 8px;
-    }
-    .card-title .badge {
-      background: #eef2f9;
-      border-radius: 30px;
-      padding: 2px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #3a4b6a;
-    }
-    /* progress bar */
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background: #e9edf4;
-      border-radius: 20px;
-      margin: 8px 0 4px;
-    }
-    .progress-bar .fill {
-      height: 100%;
-      border-radius: 20px;
-      background: linear-gradient(90deg, #5b7cfa, #8aa3ff);
-      width: 0%;
-    }
-    .flex-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .flex-col {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .stat {
-      font-size: 14px;
-      color: #3a4b6a;
-    }
-    .stat strong {
-      font-weight: 700;
-      color: #1a2b4a;
-    }
-    .highlight {
-      background: #f0f4fe;
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 6px;
-    }
-    /* list tasks */
-    .task-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
+      padding: 10px 0;
       border-bottom: 1px solid #f0f4f8;
     }
-    .task-item:last-child {
-      border-bottom: none;
-    }
-    .task-item .left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .task-item .left i {
-      color: #5b7cfa;
-      width: 20px;
-    }
-    .task-item .left .done {
-      color: #34c759;
-    }
-    .task-item .left .pending {
-      color: #ff9500;
-    }
-    .task-item .time {
-      font-size: 13px;
-      color: #8a9bb5;
-    }
-    .weak-topic {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px dashed #eef2f9;
-    }
-    .weak-topic .score {
-      font-weight: 600;
-    }
-    .weak-topic .score.low {
-      color: #ff3b30;
-    }
-    .weak-topic .score.mid {
-      color: #ff9500;
-    }
-    .recommend {
-      background: #f8faff;
-      padding: 10px 14px;
-      border-radius: 14px;
-      margin-bottom: 6px;
-      border-right: 4px solid #5b7cfa;
-      font-size: 14px;
-      color: #1a2b4a;
-    }
-    .recommend i {
-      color: #5b7cfa;
-      margin-left: 8px;
-    }
-    .achievement-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #f8faff;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #1a2b4a;
-      margin-left: 8px;
-      margin-bottom: 6px;
-      border: 1px solid #e9edf4;
-    }
-    .achievement-badge i {
-      color: #fbbf24;
-    }
-    .btn {
-      background: #5b7cfa;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn:active {
-      transform: scale(0.95);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #5b7cfa;
-      color: #5b7cfa;
-    }
-    .mt-2 { margin-top: 12px; }
-    .mb-1 { margin-bottom: 6px; }
-    .text-center { text-align: center; }
-    .text-muted { color: #8a9bb5; font-size: 14px; }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .divider {
-      height: 1px;
-      background: #e9edf4;
-      margin: 12px 0;
-    }
-    /* responsive */
-    @media (max-width: 400px) {
-      .app { padding: 16px; }
-    }
+    .lesson-item:last-child { border-bottom: none; }
+    .lesson-item .info { display:flex; flex-direction:column; gap:4px; }
+    .lesson-item .info .title { font-weight:600; color:#1a2b4a; }
+    .lesson-item .info .subject { font-size:13px; color:#8a9bb5; }
+    .lesson-item .actions { display:flex; gap:8px; align-items:center; }
+    .lesson-item .actions .completed-badge { background:#e0f2e0; color:#1a7a3a; padding:4px 12px; border-radius:30px; font-size:12px; font-weight:600; }
+    .lesson-item .actions .btn-start { background:#5b7cfa; color:white; border:none; padding:6px 16px; border-radius:30px; font-size:13px; cursor:pointer; transition:0.2s; }
+    .lesson-item .actions .btn-start:active { transform:scale(0.95); }
+    .lesson-item .actions .btn-start:disabled { opacity:0.5; cursor:not-allowed; }
   </style>
 </head>
 <body>
@@ -264,76 +78,45 @@
     <div class="user"><i class="fas fa-user-circle"></i> <span id="userPoints">0</span> نقطة</div>
   </div>
 
-  <!-- ========== الهدف والتقدم العام ========== -->
+  <!-- ========== بطاقات الإحصائيات ========== -->
   <div class="card">
-    <div class="card-title">
-      <span><i class="fas fa-bullseye"></i> هدفي</span>
-      <span class="badge" id="goalDisplay">90%</span>
-    </div>
-    <div class="flex-row">
-      <span class="stat">التقدم العام</span>
-      <span class="stat" id="progressPercent">0%</span>
-    </div>
+    <div class="card-title"><span><i class="fas fa-bullseye"></i> هدفي</span><span class="badge" id="goalDisplay">90%</span></div>
+    <div class="flex-row"><span class="stat">التقدم العام</span><span class="stat" id="progressPercent">0%</span></div>
     <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
-    <div class="flex-row mt-2">
-      <span class="stat"><i class="fas fa-check-circle" style="color:#34c759;"></i> <span id="completedLessons">0</span> درس مكتمل</span>
-      <span class="stat">من <span id="totalLessons">0</span></span>
-    </div>
+    <div class="flex-row mt-2"><span class="stat"><i class="fas fa-check-circle" style="color:#34c759;"></i> <span id="completedLessons">0</span> درس مكتمل</span><span class="stat">من <span id="totalLessons">0</span></span></div>
   </div>
 
-  <!-- ========== الخطة اليومية ========== -->
   <div class="card" onclick="goTo('plan')">
-    <div class="card-title">
-      <span><i class="fas fa-calendar-day"></i> خطتي اليوم</span>
-      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
-    </div>
-    <div id="dailyPlanContainer">
-      <!-- سيتم ملؤها بـ JS -->
-      <div class="text-muted">لا توجد مهام حالياً</div>
-    </div>
+    <div class="card-title"><span><i class="fas fa-calendar-day"></i> خطتي اليوم</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div id="dailyPlanContainer"><div class="text-muted">لا توجد مهام حالياً</div></div>
   </div>
 
-  <!-- ========== نقاط الضعف ========== -->
   <div class="card" onclick="goTo('weak')">
-    <div class="card-title">
-      <span><i class="fas fa-exclamation-triangle" style="color:#ff9500;"></i> نقاط الضعف</span>
-      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
-    </div>
-    <div id="weakTopicsContainer">
-      <div class="text-muted">لا توجد نقاط ضعف مسجلة</div>
-    </div>
+    <div class="card-title"><span><i class="fas fa-exclamation-triangle" style="color:#ff9500;"></i> نقاط الضعف</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div id="weakTopicsContainer"><div class="text-muted">لا توجد نقاط ضعف مسجلة</div></div>
   </div>
 
-  <!-- ========== الاختبار القادم ========== -->
   <div class="card" onclick="goTo('test')">
-    <div class="card-title">
-      <span><i class="fas fa-clock"></i> الاختبار القادم</span>
-      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
-    </div>
-    <div id="nextTestContainer">
-      <div class="text-muted">لا توجد اختبارات قادمة</div>
-    </div>
+    <div class="card-title"><span><i class="fas fa-clock"></i> الاختبار القادم</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div id="nextTestContainer"><div class="text-muted">لا توجد اختبارات قادمة</div></div>
   </div>
 
-  <!-- ========== الإنجازات ========== -->
   <div class="card" onclick="goTo('achievements')">
-    <div class="card-title">
-      <span><i class="fas fa-trophy" style="color:#fbbf24;"></i> إنجازاتي</span>
-      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
-    </div>
-    <div id="achievementsContainer">
-      <span class="text-muted">لا توجد إنجازات بعد</span>
-    </div>
+    <div class="card-title"><span><i class="fas fa-trophy" style="color:#fbbf24;"></i> إنجازاتي</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div id="achievementsContainer"><span class="text-muted">لا توجد إنجازات بعد</span></div>
   </div>
 
-  <!-- ========== التوصيات ========== -->
   <div class="card" onclick="goTo('recommend')">
-    <div class="card-title">
-      <span><i class="fas fa-lightbulb" style="color:#5b7cfa;"></i> توصيات لك</span>
-      <i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i>
-    </div>
-    <div id="recommendationsContainer">
-      <div class="text-muted">توصيات مخصصة ستظهر هنا</div>
+    <div class="card-title"><span><i class="fas fa-lightbulb" style="color:#5b7cfa;"></i> توصيات لك</span><i class="fas fa-chevron-left" style="color:#8a9bb5;font-size:12px;"></i></div>
+    <div id="recommendationsContainer"><div class="text-muted">توصيات مخصصة ستظهر هنا</div></div>
+  </div>
+
+  <!-- ========== قائمة الدروس (الجديدة) ========== -->
+  <div class="card">
+    <div class="card-title"><span><i class="fas fa-book-open"></i> الدروس المتاحة</span><span class="badge" id="lessonsCount">0</span></div>
+    <div id="lessonsListContainer">
+      <!-- ستُملأ بواسطة JavaScript -->
+      <div class="text-muted">لا توجد دروس حالياً</div>
     </div>
   </div>
 
@@ -350,10 +133,9 @@
 <script>
   // ============================================================
   // 1. تعريف البيانات الأساسية (الدروس، الاختبارات، الإنجازات)
-  //    هذه هي الأماكن التي يمكنك فيها إضافة محتوى جديد بسهولة
   // ============================================================
 
-  // --- دروس (مقررات) ---
+  // --- دروس (مقررات) --- تم تصحيح الأخطاء وإضافة الفواصل والأقواس
   const LESSONS_DATA = [
     { id: 'math-01', subject: 'الرياضيات', title: 'الدوال', difficulty: 'medium' },
     { id: 'math-02', subject: 'الرياضيات', title: 'التفاضل', difficulty: 'hard' },
@@ -363,27 +145,22 @@
     { id: 'physics-01', subject: 'الفيزياء', title: 'الحركة', difficulty: 'hard' },
     { id: 'physics-02', subject: 'الفيزياء', title: 'القوى', difficulty: 'medium' },
     { id: 'english-01', subject: 'اللغة الإنجليزية', title: 'المحادثة', difficulty: 'easy' },
-     id: 'chem1-intro', subject: 'الكيمياء', title: 'مقدمة في علم الكيمياء والطريقة العلمية', difficulty: 'easy' },
-  { id: 'chem1-matter', subject: 'الكيمياء', title: 'المادة: الخواص والتغيرات وتصنيفاتها', difficulty: 'easy' },
-  { id: 'chem1-atom', subject: 'الكيمياء', title: 'تركيب الذرة والتوزيع الإلكتروني', difficulty: 'medium' },
-  { id: 'chem1-reactions', subject: 'الكيمياء', title: 'التفاعلات الكيميائية والمعادلات الأيونية', difficulty: 'medium' },
-  { id: 'chem1-mole', subject: 'الكيمياء', title: 'المول والحسابات الكيميائية وصيغ المركبات', difficulty: 'hard' },
-
-  // كيمياء 2-2 (الثاني الثانوي)
-  { id: 'chem2-energy', subject: 'الكيمياء', title: 'الطاقة والتغيرات الكيميائية (الكيمياء الحرارية)', difficulty: 'medium' },
-  { id: 'chem2-speed', subject: 'الكيمياء', title: 'سرعة التفاعلات الكيميائية ورتب التفاعل', difficulty: 'hard' },
-  { id: 'chem2-equilibrium', subject: 'الكيمياء', title: 'الاتزان الكيميائي ومبدأ لوتشاتيليه', difficulty: 'hard' },
-  { id: 'chem2-hydrocarbons', subject: 'الكيمياء', title: 'الهيدروكربونات وتسمية الـ IUPAC', difficulty: 'medium' },
-  { id: 'chem2-derivatives', subject: 'الكيمياء', title: 'مشتقات الهيدروكربونات والمجموعات الوظيفية', difficulty: 'medium' },
-  { id: 'chem2-biochemistry', subject: 'الكيمياء', title: 'المركبات العضوية الحيوية (البروتينات والسكريات)', difficulty: 'easy' },
-
-  // كيمياء 3 (الثالث الثانوي)
-  { id: 'chem3-mixtures', subject: 'الكيمياء', title: 'المخاليط والمحاليل والخواص الجامعة', difficulty: 'easy' },
-  { id: 'chem3-acids', subject: 'الكيمياء', title: 'الأحماض والقواعد ومقياس الرقم الهيدروجيني pH', difficulty: 'hard' },
-  { id: 'chem3-redox', subject: 'الكيمياء', title: 'تفاعلات الأكسدة والاختزال ووزن المعادلات', difficulty: 'medium' },
-  { id: 'chem3-electro', subject: 'الكيمياء', title: 'الكيمياء الكهربائية (الخلايا الجلفانية والطلاء بالكهرباء)', difficulty: 'hard' }
-
-    // أضف المزيد من الدروس هنا ...
+    // دروس الكيمياء (تم تصحيح الأخطاء)
+    { id: 'chem1-intro', subject: 'الكيمياء', title: 'مقدمة في علم الكيمياء والطريقة العلمية', difficulty: 'easy' },
+    { id: 'chem1-matter', subject: 'الكيمياء', title: 'المادة: الخواص والتغيرات وتصنيفاتها', difficulty: 'easy' },
+    { id: 'chem1-atom', subject: 'الكيمياء', title: 'تركيب الذرة والتوزيع الإلكتروني', difficulty: 'medium' },
+    { id: 'chem1-reactions', subject: 'الكيمياء', title: 'التفاعلات الكيميائية والمعادلات الأيونية', difficulty: 'medium' },
+    { id: 'chem1-mole', subject: 'الكيمياء', title: 'المول والحسابات الكيميائية وصيغ المركبات', difficulty: 'hard' },
+    { id: 'chem2-energy', subject: 'الكيمياء', title: 'الطاقة والتغيرات الكيميائية (الكيمياء الحرارية)', difficulty: 'medium' },
+    { id: 'chem2-speed', subject: 'الكيمياء', title: 'سرعة التفاعلات الكيميائية ورتب التفاعل', difficulty: 'hard' },
+    { id: 'chem2-equilibrium', subject: 'الكيمياء', title: 'الاتزان الكيميائي ومبدأ لوتشاتيليه', difficulty: 'hard' },
+    { id: 'chem2-hydrocarbons', subject: 'الكيمياء', title: 'الهيدروكربونات وتسمية الـ IUPAC', difficulty: 'medium' },
+    { id: 'chem2-derivatives', subject: 'الكيمياء', title: 'مشتقات الهيدروكربونات والمجموعات الوظيفية', difficulty: 'medium' },
+    { id: 'chem2-biochemistry', subject: 'الكيمياء', title: 'المركبات العضوية الحيوية (البروتينات والسكريات)', difficulty: 'easy' },
+    { id: 'chem3-mixtures', subject: 'الكيمياء', title: 'المخاليط والمحاليل والخواص الجامعة', difficulty: 'easy' },
+    { id: 'chem3-acids', subject: 'الكيمياء', title: 'الأحماض والقواعد ومقياس الرقم الهيدروجيني pH', difficulty: 'hard' },
+    { id: 'chem3-redox', subject: 'الكيمياء', title: 'تفاعلات الأكسدة والاختزال ووزن المعادلات', difficulty: 'medium' },
+    { id: 'chem3-electro', subject: 'الكيمياء', title: 'الكيمياء الكهربائية (الخلايا الجلفانية والطلاء بالكهرباء)', difficulty: 'hard' }
   ];
 
   // --- اختبارات ---
@@ -391,255 +168,61 @@
     { id: 'math-test-01', title: 'اختبار الرياضيات (التفاضل)', date: '2026-09-06', duration: 20 },
     { id: 'arabic-test-01', title: 'اختبار اللغة العربية (النحو)', date: '2026-09-10', duration: 15 },
     { id: 'physics-test-01', title: 'اختبار الفيزياء (الحركة)', date: '2026-09-15', duration: 25 },
-      { id: 'test-chem1-mid', title: 'اختبار كيمياء 1 (الفترة الأولى)', date: '2026-09-15', duration: 20 },
-  { id: 'test-chem1-final-practical', title: 'الاختبار النهائي العملي (كيمياء 1)', date: '2026-10-05', duration: 30 },
-  { id: 'test-chem2-mid', title: 'اختبار كيمياء 2-2 (الفترة الأولى - الكيمياء الحرارية)', date: '2026-11-10', duration: 20 },
-  { id: 'test-chem2-final-theory', title: 'الاختبار النهائي النظري (كيمياء 2-2)', date: '2026-11-30', duration: 50 },
-  { id: 'test-chem3-practical', title: 'الاختبار النهائي العملي (كيمياء 3 - الأحماض والطلاء)', date: '2026-12-15', duration: 15 },
-  { id: 'test-chem3-final', title: 'الاختبار النهائي الشامل (كيمياء 3)', date: '2026-12-25', duration: 40 }
-
-    // أضف اختبارات جديدة هنا ...
+    { id: 'test-chem1-mid', title: 'اختبار كيمياء 1 (الفترة الأولى)', date: '2026-09-15', duration: 20 },
+    { id: 'test-chem1-final-practical', title: 'الاختبار النهائي العملي (كيمياء 1)', date: '2026-10-05', duration: 30 },
+    { id: 'test-chem2-mid', title: 'اختبار كيمياء 2-2 (الفترة الأولى - الكيمياء الحرارية)', date: '2026-11-10', duration: 20 },
+    { id: 'test-chem2-final-theory', title: 'الاختبار النهائي النظري (كيمياء 2-2)', date: '2026-11-30', duration: 50 },
+    { id: 'test-chem3-practical', title: 'الاختبار النهائي العملي (كيمياء 3 - الأحماض والطلاء)', date: '2026-12-15', duration: 15 },
+    { id: 'test-chem3-final', title: 'الاختبار النهائي الشامل (كيمياء 3)', date: '2026-12-25', duration: 40 }
   ];
-  
-  // --- أسئلة الاختبارات (Quiz) ---
-const QUESTIONS_DATA = [
-// 1. اختبار كيمياء 1 (الفترة الأولى)
-  'test-chem1-mid': [
-    {
-      question: 'يوجد غاز الأوزون (O3) الذي يحمي الأرض من الأشعة فوق البنفسجية الضارة في طبقة:',
-      options: ['التروبوسفير', 'الستراتوسفير', 'الميزوسفير', 'الأكسوسفير'],
-      correctAnswer: 'الستراتوسفير',
-      topic: 'مقدمة في الكيمياء'
-    },
-    {
-      question: 'ما فرع علم الكيمياء الذي يستقصي مواد التغليف وتحللها في البيئة؟',
-      options: ['الكيمياء الحيوية', 'الكيمياء العضوية', 'الكيمياء البيئية', 'الكيمياء الفيزيائية'],
-      correctAnswer: 'الكيمياء البيئية',
-      topic: 'فروع الكيمياء'
-    },
-    {
-      question: 'الميثاق الدولي الذي يقضي بالحد من استعمال مركبات الكلوروفلوروكربون (CFCs) هو ميثاق:',
-      options: ['مونتريال', 'دوبسون', 'توماس', 'كيوتو'],
-      correctAnswer: 'مونتريال',
-      topic: 'الأوزون والبيئة'
-    },
-    {
-      question: 'عند دراسة أثر درجة الحرارة في حجم بالون، وجد أن حجم البالون يزداد بالتسخين. المتغير المستقل هنا هو:',
-      options: ['حجم البالون', 'درجة الحرارة', 'كمية الهواء في البالون', 'ضغط البالون'],
-      correctAnswer: 'درجة الحرارة',
-      topic: 'الطريقة العلمية'
-    }
-  ],
 
-  // 2. الاختبار النهائي العملي (كيمياء 1)
-  'test-chem1-final-practical': [
-    {
-      question: 'أي الفلزات التالية يعتبر الأكثر نشاطاً في سلسلة نشاط الكيمياء العملي مقارنة بالبقرة (Ag, Cu, Pb, Zn, Mg)؟',
-      options: ['الرصاص Pb', 'النحاس Cu', 'المغنيسيوم Mg', 'الخارصين Zn'],
-      correctAnswer: 'المغنيسيوم Mg',
-      topic: 'النشاط الكيميائي العملي'
-    },
-    {
-      question: 'ما هو الدليل العملي لموقع الهيدروجين في سلسلة النشاط الكيميائي عند تفاعل النحاس مع حمض الهيدروكلوريك HCl؟',
-      options: ['تغير اللون', 'تصاعد فقاقيع غاز', 'لا يحدث تفاعل (لا شيء)', 'ترسب مادة صلبة'],
-      correctAnswer: 'لا يحدث تفاعل (لا شيء)',
-      topic: 'تفاعلات الإحلال البسيط'
-    },
-    {
-      question: 'عند تفاعل الصوديوم مع الماء لإنتاج هيدروكسيد الصوديوم وغاز الهيدروجين، يصنف التفاعل بأنه تفاعل:',
-      options: ['تفكك', 'إحلال بسيط', 'إحلال مزدوج', 'احتراق'],
-      correctAnswer: 'إحلال بسيط',
-      topic: 'تصنيف التفاعلات كيميائياً'
-    }
-  ],
+  // --- أسئلة الاختبارات (صيغة مصفوفة صحيحة) ---
+  const QUESTIONS_DATA = [
+    // test-chem1-mid
+    { testId: 'test-chem1-mid', question: 'يوجد غاز الأوزون (O3) الذي يحمي الأرض من الأشعة فوق البنفسجية الضارة في طبقة:', options: ['التروبوسفير', 'الستراتوسفير', 'الميزوسفير', 'الأكسوسفير'], correct: 1 },
+    { testId: 'test-chem1-mid', question: 'ما فرع علم الكيمياء الذي يستقصي مواد التغليف وتحللها في البيئة؟', options: ['الكيمياء الحيوية', 'الكيمياء العضوية', 'الكيمياء البيئية', 'الكيمياء الفيزيائية'], correct: 2 },
+    { testId: 'test-chem1-mid', question: 'الميثاق الدولي الذي يقضي بالحد من استعمال مركبات الكلوروفلوروكربون (CFCs) هو ميثاق:', options: ['مونتريال', 'دوبسون', 'توماس', 'كيوتو'], correct: 0 },
+    { testId: 'test-chem1-mid', question: 'عند دراسة أثر درجة الحرارة في حجم بالون، وجد أن حجم البالون يزداد بالتسخين. المتغير المستقل هنا هو:', options: ['حجم البالون', 'درجة الحرارة', 'كمية الهواء في البالون', 'ضغط البالون'], correct: 1 },
+    // test-chem1-final-practical
+    { testId: 'test-chem1-final-practical', question: 'أي الفلزات التالية يعتبر الأكثر نشاطاً في سلسلة نشاط الكيمياء العملي مقارنة بالبقرة (Ag, Cu, Pb, Zn, Mg)؟', options: ['الرصاص Pb', 'النحاس Cu', 'المغنيسيوم Mg', 'الخارصين Zn'], correct: 2 },
+    { testId: 'test-chem1-final-practical', question: 'ما هو الدليل العملي لموقع الهيدروجين في سلسلة النشاط الكيميائي عند تفاعل النحاس مع حمض الهيدروكلوريك HCl؟', options: ['تغير اللون', 'تصاعد فقاقيع غاز', 'لا يحدث تفاعل (لا شيء)', 'ترسب مادة صلبة'], correct: 2 },
+    { testId: 'test-chem1-final-practical', question: 'عند تفاعل الصوديوم مع الماء لإنتاج هيدروكسيد الصوديوم وغاز الهيدروجين، يصنف التفاعل بأنه تفاعل:', options: ['تفكك', 'إحلال بسيط', 'إحلال مزدوج', 'احتراق'], correct: 1 },
+    // test-chem2-mid
+    { testId: 'test-chem2-mid', question: 'ما المصطلح الذي يُطلق على الطاقة المخزنة في الروابط الكيميائية للمادة؟', options: ['الطاقة الحركية', 'طاقة الوضع الكيميائية', 'الحرارة النوعية', 'الطاقة الشمسية'], correct: 1 },
+    { testId: 'test-chem2-mid', question: 'أي المعادلات التالية تُستعمل لحساب كمية الحرارة الممتصة أو المنطلقة (q)؟', options: ['q = c × m', 'q = c × m × ΔT', 'q = c × m / ΔT', 'q = m × ΔT'], correct: 1 },
+    { testId: 'test-chem2-mid', question: 'ما هي وحدة قياس الطاقة والحرارة وفق النظام الدولي للوحدات (SI)؟', options: ['السعر (cal)', 'السعر الغذائي (Cal)', 'الدرجة المئوية (C)', 'الجول (J)'], correct: 3 },
+    { testId: 'test-chem2-mid', question: 'تسمى كمية الحرارة اللازمة لتبخر 1 مول من سائل ما بـ:', options: ['حرارة الانصهار المولارية', 'حرارة التبخر المولارية', 'حرارة الاحتراق', 'حرارة التجمد المولارية'], correct: 1 },
+    // test-chem2-final-theory
+    { testId: 'test-chem2-final-theory', question: 'الكتلة المولية لمركب كلوريد الكالسيوم CaCl2 علماً بأن (Ca = 40, Cl = 35.5) تساوي:', options: ['75.5 g/mol', '111 g/mol', '211 g/mol', '311 g/mol'], correct: 1 },
+    { testId: 'test-chem2-final-theory', question: 'أول من اقترح فكرة أن المادة تتكون من أجزاء صغيرة جداً غير قابلة للانقسام هو الفيلسوف:', options: ['أرسطو', 'دالتون', 'رذرفورد', 'ديموقريطس'], correct: 3 },
+    { testId: 'test-chem2-final-theory', question: 'أي من الإشعاعات الكهروكيميائية/الفيزيائية التالية ساهم اكتشافها في اختراع التلفزيون؟', options: ['أشعة ألفا', 'أشعة بيتا', 'أشعة المهبط', 'المصعد'], correct: 2 },
+    { testId: 'test-chem2-final-theory', question: 'إذا كانت قيمة طاقة التنشيط Ea لتفاعل ما عالية جداً، فماذا تتوقع بخصوص سرعة هذا التفاعل؟', options: ['يكون التفاعل سريعاً جداً', 'يكون التفاعل بطيئاً لقلة عدد الاصطدامات الفعالة', 'لا يؤثر ذلك على سرعة التفاعل', 'يكون التفاعل تلقائياً'], correct: 1 },
+    { testId: 'test-chem2-final-theory', question: 'في التفاعل المتزن الكيميائي، يزداد انخفاض ذوبانية المادة بسبب تأثير:', options: ['الحاصل الأيوني', 'الأيون المشترك', 'القوى الكهروساتيكية', 'تأثير تندال'], correct: 1 },
+    { testId: 'test-chem2-final-theory', question: 'ما حالة الاتزان التي تكون فيها المواد المتفاعلة والناتجة في حالات فيزيائية مختلفة؟', options: ['الاتزان المتجانس', 'الاتزان غير المتجانس', 'الاتزان الديناميكي المفتوح', 'لا يوجد اتزان'], correct: 1 },
+    // test-chem3-practical
+    { testId: 'test-chem3-practical', question: 'في تجربة الطلاء بالكهرباء لمفتاح من النحاس، ما القطب الذي يحدث عنده تفاعل الاختزال ويزداد حجمه وكتلته كاثودياً؟', options: ['المصعد (الأنود)', 'المهبط (الكاثود)', 'المحلول الإلكتروليتي', 'القنطرة الملحية'], correct: 1 },
+    { testId: 'test-chem3-practical', question: 'ما لون ورقة تباع الشمس الزرقاء عند غمسها في محلول حمضي مثل حمض الهيدروكلوريك HCl؟', options: ['يتحول إلى الأحمر', 'يتحول إلى الأزرق الداكن', 'تظل زرقاء دون تغيير', 'تتحول إلى عديمة اللون'], correct: 0 },
+    { testId: 'test-chem3-practical', question: 'ما الصيغة الكيميائية الصحيحة لهيدروكسيد الصوديوم المستخدم كقاعدة قوية في تجارب التعادل؟', options: ['HCl', 'NaCl', 'NaOH', 'H2O'], correct: 2 },
+    // test-chem3-final
+    { testId: 'test-chem3-final', question: 'الحركة العشوائية العنيفة لجسيمات المذاب في المخاليط الغروية والتي تمنعها من الترسّب تسمى الحركة:', options: ['الموجية', 'المستقيمة', 'البراونية', 'الدائرية'], correct: 2 },
+    { testId: 'test-chem3-final', question: 'تفاعل حمض مع قاعدة لإنتاج ملح وماء يسمى تفاعل:', options: ['التعادل', 'التماثل', 'الأكسدة', 'الاختزال'], correct: 0 },
+    { testId: 'test-chem3-final', question: 'إذا كان تركيز أيون الهيدروكسيد [OH-] في محلول مائي يساوي 1.0 × 10^-6 M عند درجة حرارة 298 K، فإن قيم pH و pOH هي:', options: ['pH = 11.6 , pOH = 2.4', 'pH = 4.8 , pOH = 8.2', 'pH = 8.0 , pOH = 6.0', 'pH = 6.0 , pOH = 8.0'], correct: 2 },
+    { testId: 'test-chem3-final', question: 'القطب الذي تحدث عنده عملية الأكسدة دائماً في الخلايا الجلفانية الكهروكيميائية هو قطب:', options: ['الكاثود (المهبط)', 'الأنود (المصعد)', 'القنطرة الملحية', 'السلك الخارجي'], correct: 1 }
+  ];
 
-  // 3. اختبار كيمياء 2-2 (الفترة الأولى - الكيمياء الحرارية)
-  'test-chem2-mid': [
-    {
-      question: 'ما المصطلح الذي يُطلق على الطاقة المخزنة في الروابط الكيميائية للمادة؟',
-      options: ['الطاقة الحركية', 'طاقة الوضع الكيميائية', 'الحرارة النوعية', 'الطاقة الشمسية'],
-      correctAnswer: 'طاقة الوضع الكيميائية',
-      topic: 'الكيمياء الحرارية'
-    },
-    {
-      question: 'أي المعادلات التالية تُستعمل لحساب كمية الحرارة الممتصة أو المنطلقة (q)؟',
-      options: ['q = c × m', 'q = c × m × ΔT', 'q = c × m / ΔT', 'q = m × ΔT'],
-      correctAnswer: 'q = c × m × ΔT',
-      topic: 'حسابات الحرارة'
-    },
-    {
-      question: 'ما هي وحدة قياس الطاقة والحرارة وفق النظام الدولي للوحدات (SI)؟',
-      options: ['السعر (cal)', 'السعر الغذائي (Cal)', 'الدرجة المئوية (C)', 'الجول (J)'],
-      correctAnswer: 'الجول (J)',
-      topic: 'وحدات الطاقة'
-    },
-    {
-      question: 'تسمى كمية الحرارة اللازمة لتبخر 1 مول من سائل ما بـ:',
-      options: ['حرارة الانصهار المولارية', 'حرارة التبخر المولارية', 'حرارة الاحتراق', 'حرارة التجمد المولارية'],
-      correctAnswer: 'حرارة التبخر المولارية',
-      topic: 'تغيرات الحالة الفيزيائية'
-    }
-  ],
-
-  // 4. الاختبار النهائي النظري (كيمياء 2-2)
-  'test-chem2-final-theory': [
-    {
-      question: 'الكتلة المولية لمركب كلوريد الكالسيوم CaCl2 علماً بأن (Ca = 40, Cl = 35.5) تساوي:',
-      options: ['75.5 g/mol', '111 g/mol', '211 g/mol', '311 g/mol'],
-      correctAnswer: '111 g/mol',
-      topic: 'الحسابات الكيميائية والمول'
-    },
-    {
-      question: 'أول من اقترح فكرة أن المادة تتكون من أجزاء صغيرة جداً غير قابلة للانقسام هو الفيلسوف:',
-      options: ['أرسطو', 'دالتون', 'رذرفورد', 'ديموقريطس'],
-      correctAnswer: 'ديموقريطس',
-      topic: 'النماذج الذرية القديمة'
-    },
-    {
-      question: 'أي من الإشعاعات الكهروكيميائية/الفيزيائية التالية ساهم اكتشافها في اختراع التلفزيون؟',
-      options: ['أشعة ألفا', 'أشعة بيتا', 'أشعة المهبط', 'المصعد'],
-      correctAnswer: 'أشعة المهبط',
-      topic: 'الأشعة النووية والذرية'
-    },
-    {
-      question: 'إذا كانت قيمة طاقة التنشيط Ea لتفاعل ما عالية جداً، فماذا تتوقع بخصوص سرعة هذا التفاعل؟',
-      options: ['يكون التفاعل سريعاً جداً', 'يكون التفاعل بطيئاً لقلة عدد الاصطدامات الفعالة', 'لا يؤثر ذلك على سرعة التفاعل', 'يكون التفاعل تلقائياً'],
-      correctAnswer: 'يكون التفاعل بطيئاً لقلة عدد الاصطدامات الفعالة',
-      topic: 'سرعة التفاعلات الكيميائية'
-    },
-    {
-      question: 'في التفاعل المتزن الكيميائي، يزداد انخفاض ذوبانية المادة بسبب تأثير:',
-      options: ['الحاصل الأيوني', 'الأيون المشترك', 'القوى الكهروساتيكية', 'تأثير تندال'],
-      correctAnswer: 'الأيون المشترك',
-      topic: 'الاتزان الكيميائي'
-    },
-    {
-      question: 'ما حالة الاتزان التي تكون فيها المواد المتفاعلة والناتجة في حالات فيزيائية مختلفة؟',
-      options: ['الاتزان المتجانس', 'الاتزان غير المتجانس', 'الاتزان الديناميكي المفتوح', 'لا يوجد اتزان'],
-      correctAnswer: 'الاتزان غير المتجانس',
-      topic: 'حالة الاتزان الكيميائي'
-    }
-  ],
-
-  // 5. الاختبار النهائي العملي (كيمياء 3 - الأحماض والطلاء)
-  'test-chem3-practical': [
-    {
-      question: 'في تجربة الطلاء بالكهرباء لمفتاح من النحاس، ما القطب الذي يحدث عنده تفاعل الاختزال ويزداد حجمه وكتلته كاثودياً؟',
-      options: ['المصعد (الأنود)', 'المهبط (الكاثود)', 'المحلول الإلكتروليتي', 'القنطرة الملحية'],
-      correctAnswer: 'المهبط (الكاثود)',
-      topic: 'الطلاء الكهربائي العملي'
-    },
-    {
-      question: 'ما لون ورقة تباع الشمس الزرقاء عند غمسها في محلول حمضي مثل حمض الهيدروكلوريك HCl؟',
-      options: ['يتحول إلى الأحمر', 'يتحول إلى الأزرق الداكن', 'تظل زرقاء دون تغيير', 'تتحول إلى عديمة اللون'],
-      correctAnswer: 'يتحول إلى الأحمر',
-      topic: 'الكشف عن الأحماض عملياً'
-    },
-    {
-      question: 'ما الصيغة الكيميائية الصحيحة لهيدروكسيد الصوديوم المستخدم كقاعدة قوية في تجارب التعادل؟',
-      options: ['HCl', 'NaCl', 'NaOH', 'H2O'],
-      correctAnswer: 'NaOH',
-      topic: 'صيغ المركبات الشائعة'
-    }
-  ],
-
-  // 6. الاختبار النهائي الشامل (كيمياء 3)
-  'test-chem3-final': [
-    {
-      question: 'الحركة العشوائية العنيفة لجسيمات المذاب في المخاليط الغروية والتي تمنعها من الترسّب تسمى الحركة:',
-      options: ['الموجية', 'المستقيمة', 'البراونية', 'الدائرية'],
-      correctAnswer: 'البراونية',
-      topic: 'المخاليط والمحاليل'
-    },
-    {
-      question: 'تفاعل حمض مع قاعدة لإنتاج ملح وماء يسمى تفاعل:',
-      options: ['التعادل', 'التماثل', 'الأكسدة', 'الاختزال'],
-      correctAnswer: 'التعادل',
-      topic: 'تفاعلات الأحماض والقواعد'
-    },
-    {
-      question: 'إذا كان تركيز أيون الهيدروكسيد [OH-] في محلول مائي يساوي 1.0 × 10^-6 M عند درجة حرارة 298 K، فإن قيم pH و pOH هي:',
-      options: ['pH = 11.6 , pOH = 2.4', 'pH = 4.8 , pOH = 8.2', 'pH = 8.0 , pOH = 6.0', 'pH = 6.0 , pOH = 8.0'],
-      correctAnswer: 'pH = 8.0 , pOH = 6.0',
-      topic: 'الرقم الهيدروجيني وحساباته'
-    },
-    {
-      question: 'القطب الذي تحدث عنده عملية الأكسدة دائماً في الخلايا الجلفانية الكهروكيميائية هو قطب:',
-      options: ['الكاثود (المهبط)', 'الأنود (المصعد)', 'القنطرة الملحية', 'السلك الخارجي'],
-      correctAnswer: 'الأنود (المصعد)',
-      topic: 'الكيمياء الكهربائية'
-    },
-  // أضف المزيد من الأسئلة هنا ...
-];
-  
   // --- تعريف الإنجازات (القواعد) ---
   const ACHIEVEMENT_DEFS = {
-    'first-lesson': {
-      name: 'أول درس',
-      icon: 'fa-book-open',
-      condition: (user) => user.completedLessons.length >= 1
-    },
-    'first-test': {
-      name: 'أول اختبار',
-      icon: 'fa-check-circle',
-      condition: (user) => user.testResults.length >= 1
-    },
-    'points-1000': {
-      name: '⭐ 1000 نقطة',
-      icon: 'fa-star',
-      condition: (user) => user.points >= 1000
-    },
-    'seven-days': {
-      name: '🔥 7 أيام متتالية',
-      icon: 'fa-fire',
-      condition: (user) => user.streak >= 7
-    },
-    'five-lessons': {
-      name: '📘 5 دروس مكتملة',
-      icon: 'fa-graduation-cap',
-      condition: (user) => user.completedLessons.length >= 5
-    },
-    // شارة ترحيبية عند إكمال أول درس في المادة
-  'chem-welcome': {
-    name: '🏅 خطوة أولى في المختبر',
-    icon: 'fa-vial',
-    condition: (user) => user.completedLessons.length >= 1
-  },
-
-  // شارة مخصصة لإنهاء المستوى المتوسط وكتابة التوزيع الإلكتروني
-  'chem-intermediate': {
-    name: '⚛️ مستكشف الذرة والروابط',
-    icon: 'fa-atom',
-    condition: (user) => user.completedLessons.length >= 4
-  },
-
-  // شارة العبقرية الكيميائية عند إكمال جميع دروس المسار الـ 15 المذكورة أعلاه
-  'chem-master': {
-    name: '🧪 عبقري الكيمياء الشامل',
-    icon: 'fa-flask',
-    condition: (user) => user.completedLessons.length >= 15
-  },
-
-  // شارة مخصصة لحل الاختبارات العملية والنظرية بنجاح
-  'test-pioneer': {
-    name: '⚡ بطل الاختبارات والتحليلات الكيميائية',
-    icon: 'fa-graduation-cap',
-    condition: (user) => user.testResults.length >= 3
-  },
-
-  // شارة لتشجيع الطالب على المراجعة المستمرة دون انقطاع
-  'streak-hot': {
-    name: '🔥 تفاعل نشط ومستمر لـ 5 أيام متتالية',
-    icon: 'fa-fire',
-    condition: (user) => user.streak >= 5
-  },
-
-  // شارة مخصصة لتجميع النقاط العالية من المسائل الحسابية الصعبة في المول والـ pH والتغير الحراري
-  'points-elite': {
-    name: '💎 النخبة الكيميائية (1500 نقطة)',
-    icon: 'fa-gem',
-    condition: (user) => user.points >= 1500
-  }
+    'first-lesson': { name: 'أول درس', icon: 'fa-book-open', condition: (user) => user.completedLessons.length >= 1 },
+    'first-test': { name: 'أول اختبار', icon: 'fa-check-circle', condition: (user) => user.testResults.length >= 1 },
+    'points-1000': { name: '⭐ 1000 نقطة', icon: 'fa-star', condition: (user) => user.points >= 1000 },
+    'seven-days': { name: '🔥 7 أيام متتالية', icon: 'fa-fire', condition: (user) => user.streak >= 7 },
+    'five-lessons': { name: '📘 5 دروس مكتملة', icon: 'fa-graduation-cap', condition: (user) => user.completedLessons.length >= 5 },
+    'chem-welcome': { name: '🏅 خطوة أولى في المختبر', icon: 'fa-vial', condition: (user) => user.completedLessons.length >= 1 },
+    'chem-intermediate': { name: '⚛️ مستكشف الذرة والروابط', icon: 'fa-atom', condition: (user) => user.completedLessons.length >= 4 },
+    'chem-master': { name: '🧪 عبقري الكيمياء الشامل', icon: 'fa-flask', condition: (user) => user.completedLessons.length >= 15 },
+    'test-pioneer': { name: '⚡ بطل الاختبارات والتحليلات الكيميائية', icon: 'fa-graduation-cap', condition: (user) => user.testResults.length >= 3 },
+    'streak-hot': { name: '🔥 تفاعل نشط ومستمر لـ 5 أيام متتالية', icon: 'fa-fire', condition: (user) => user.streak >= 5 },
+    'points-elite': { name: '💎 النخبة الكيميائية (1500 نقطة)', icon: 'fa-gem', condition: (user) => user.points >= 1500 }
   };
 
   // ============================================================
@@ -649,7 +232,7 @@ const QUESTIONS_DATA = [
 
   function getDefaultUser() {
     return {
-      name: '',          // فارغ، سيطلب من المستخدم إدخاله عبر الضغط على الاسم
+      name: '',
       goal: 90,
       points: 0,
       completedLessons: [],
@@ -680,7 +263,7 @@ const QUESTIONS_DATA = [
   }
 
   // ============================================================
-  // 3. الوظائف الأساسية لحساب التقدم، نقاط الضعف، الخطة، إلخ.
+  // 3. الوظائف الأساسية (نفس السابق مع تعديلات بسيطة)
   // ============================================================
 
   function getUserStats(user) {
@@ -801,12 +384,67 @@ const QUESTIONS_DATA = [
   }
 
   // ============================================================
-  // 4. تحديث واجهة المستخدم
+  // 4. وظيفة عرض الدروس (جديدة)
+  // ============================================================
+  function renderLessonsList() {
+    const user = loadUser();
+    const container = document.getElementById('lessonsListContainer');
+    const countSpan = document.getElementById('lessonsCount');
+    const total = LESSONS_DATA.length;
+    countSpan.textContent = total;
+
+    if (total === 0) {
+      container.innerHTML = `<div class="text-muted">لا توجد دروس حالياً</div>`;
+      return;
+    }
+
+    const completedIds = new Set(user.completedLessons);
+    let html = '';
+    LESSONS_DATA.forEach(lesson => {
+      const isCompleted = completedIds.has(lesson.id);
+      html += `
+        <div class="lesson-item">
+          <div class="info">
+            <div class="title">${lesson.title}</div>
+            <div class="subject">${lesson.subject} • ${lesson.difficulty === 'easy' ? 'سهل' : lesson.difficulty === 'medium' ? 'متوسط' : 'صعب'}</div>
+          </div>
+          <div class="actions">
+            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : `<button class="btn-start" onclick="completeLesson('${lesson.id}')">بدء الدراسة</button>`}
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // ============================================================
+  // 5. دالة إكمال الدرس (جديدة)
+  // ============================================================
+  function completeLesson(lessonId) {
+    const user = loadUser();
+    if (user.completedLessons.includes(lessonId)) {
+      alert('هذا الدرس مكتمل بالفعل!');
+      return;
+    }
+    // إضافة الدرس إلى المكتملين
+    user.completedLessons.push(lessonId);
+    // إضافة نقاط (مثلاً 10 نقاط لكل درس)
+    user.points = (user.points || 0) + 10;
+    // تحديث streak (محاكاة)
+    user.streak = (user.streak || 0) + 1;
+    saveUser(user);
+    // إعادة رسم الواجهة
+    renderDashboard();
+    renderLessonsList();
+    alert(`✅ تم إكمال درس "${LESSONS_DATA.find(l => l.id === lessonId)?.title}" بنجاح!`);
+  }
+
+  // ============================================================
+  // 6. تحديث واجهة المستخدم (نفس السابق مع إضافة عرض الدروس)
   // ============================================================
 
   function renderDashboard() {
     const user = loadUser();
-    // تحديث الاسم
     const nameSpan = document.getElementById('userName');
     if (user.name && user.name.trim() !== '') {
       nameSpan.textContent = user.name;
@@ -866,7 +504,7 @@ const QUESTIONS_DATA = [
           </div>
           <span class="badge">${nextTest.duration} دقيقة</span>
         </div>
-        <div style="margin-top:8px;"><button class="btn" onclick="event.stopPropagation(); alert('بدء الاختبار: ${nextTest.title}')" style="padding:6px 16px;font-size:13px;">ابدأ الاختبار</button></div>
+        <div style="margin-top:8px;"><button class="btn" onclick="event.stopPropagation(); startQuiz('${nextTest.id}')" style="padding:6px 16px;font-size:13px;">ابدأ الاختبار</button></div>
       `;
     } else {
       testContainer.innerHTML = `<div class="text-muted">✅ لا توجد اختبارات قادمة</div>`;
@@ -897,10 +535,13 @@ const QUESTIONS_DATA = [
     } else {
       recContainer.innerHTML = recs.map(r => `<div class="recommend"><i class="fas fa-lightbulb"></i> ${r}</div>`).join('');
     }
+
+    // تحديث قائمة الدروس (استدعاء جديد)
+    renderLessonsList();
   }
 
   // ============================================================
-  // 5. وظيفة تغيير الاسم (الجزء الجديد المهم)
+  // 7. وظيفة تغيير الاسم
   // ============================================================
   function changeName() {
     const user = loadUser();
@@ -913,7 +554,6 @@ const QUESTIONS_DATA = [
         saveUser(user);
         renderDashboard();
       } else if (trimmed === '' && currentName !== '') {
-        // إذا أراد المستخدم مسح الاسم
         user.name = '';
         saveUser(user);
         renderDashboard();
@@ -922,13 +562,12 @@ const QUESTIONS_DATA = [
   }
 
   // ============================================================
-  // 6. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
+  // 8. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
   // ============================================================
 
   function resetProgress() {
     if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
       const def = getDefaultUser();
-      // نحتفظ بالاسم القديم إذا وجد (لطفاً)
       const oldUser = loadUser();
       if (oldUser.name) def.name = oldUser.name;
       saveUser(def);
@@ -936,14 +575,20 @@ const QUESTIONS_DATA = [
     }
   }
 
+  // تحسين دالة addSampleData لتضيف دروساً نموذجية مع نقاط
   function addSampleData() {
     const user = loadUser();
-    const sampleLessons = ['math-01', 'math-03', 'arabic-01', 'physics-02'];
-    sampleLessons.forEach(id => {
+    // إضافة 5 دروس نموذجية (أول 5 دروس في القائمة)
+    const sampleLessonIds = LESSONS_DATA.slice(0, 5).map(l => l.id);
+    let added = 0;
+    sampleLessonIds.forEach(id => {
       if (!user.completedLessons.includes(id)) {
         user.completedLessons.push(id);
+        user.points = (user.points || 0) + 10;
+        added++;
       }
     });
+    // إضافة نتائج اختبارات نموذجية
     const sampleResults = [
       { testId: 'math-test-01', score: 55 },
       { testId: 'arabic-test-01', score: 62 },
@@ -954,11 +599,22 @@ const QUESTIONS_DATA = [
         user.testResults.push(sr);
       }
     });
-    user.points = Math.max(user.points, 450);
     user.streak = Math.max(user.streak, 3);
     saveUser(user);
     renderDashboard();
-    alert('تمت إضافة بيانات نموذجية!');
+    alert(`تمت إضافة ${added} دروس نموذجية!`);
+  }
+
+  // دالة بدء الاختبار (مؤقتة)
+  function startQuiz(testId) {
+    const questions = QUESTIONS_DATA.filter(q => q.testId === testId);
+    if (questions.length === 0) {
+      alert('لا توجد أسئلة لهذا الاختبار حالياً.');
+      return;
+    }
+    // هنا يمكنك تنفيذ واجهة اختبار كاملة، حالياً نعرض تنبيه
+    alert(`سيبدأ الاختبار: ${TESTS_DATA.find(t => t.id === testId)?.title}\nعدد الأسئلة: ${questions.length}`);
+    // يمكنك تطويرها لاحقاً لعرض أسئلة وإجابة وحساب النتيجة
   }
 
   function goTo(section) {
@@ -966,12 +622,12 @@ const QUESTIONS_DATA = [
   }
 
   // ============================================================
-  // 7. التشغيل الأولي
+  // 9. التشغيل الأولي
   // ============================================================
 
   if (!localStorage.getItem(STORAGE_KEY)) {
     const def = getDefaultUser();
-    def.name = ''; // فارغ
+    def.name = '';
     def.points = 0;
     def.completedLessons = [];
     def.testResults = [];
