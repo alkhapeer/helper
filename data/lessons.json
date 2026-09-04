@@ -29,5 +29,49 @@
   { "id": "chem3-redox", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الأكسدة والاختزال", "difficulty": "medium", "content": "تفاعلات الأكسدة والاختزال تتضمن انتقال الإلكترونات." },
   { "id": "chem3-electro", "stage": "ثانوي", "subjectId": "chemistry-sec", "title": "الكيمياء الكهربائية", "difficulty": "hard", "content": "الخلايا الجلفانية تحول الطاقة الكيميائية إلى كهربائية." },
   { "id": "s-bio-1", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الخلية وتركيبها", "difficulty": "medium", "content": "تركيب الخلية ووظائفها." },
-  { "id": "s-bio-2", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الوراثة", "difficulty": "hard", "content": "مبادئ الوراثة وقوانين مندل." }
+  { "id": "s-bio-2", "stage": "ثانوي", "subjectId": "biology-sec", "title": "الوراثة", "difficulty": "hard", "content": "مبادئ الوراثة وقوانين مندل." },
+  {
+    "id": "chem3-acids",
+    "stage": "ثانوي",
+    "subjectId": "chemistry-sec",
+    "title": "الأحماض والقواعد",
+    "difficulty": "hard",
+    "content": "
+      <div class='highlight-box'>
+        <strong>📘 تعريف الأحماض والقواعد</strong>
+        <p>الحمض: مادة تتفكك في الماء وتعطي أيونات الهيدروجين (H⁺).<br>
+        القاعدة: مادة تتفكك في الماء وتعطي أيونات الهيدروكسيد (OH⁻).</p>
+      </div>
+
+      <h2>مقياس الرقم الهيدروجيني (pH)</h2>
+      <p>يقيس pH حموضة أو قاعدية المحلول، ويتراوح من 0 إلى 14.</p>
+      <ul>
+        <li><strong>pH &lt; 7</strong> → حمضي</li>
+        <li><strong>pH = 7</strong> → متعادل (ماء نقي)</li>
+        <li><strong>pH &gt; 7</strong> → قاعدي</li>
+      </ul>
+
+      <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/PH_scale_%281%29.png/800px-PH_scale_%281%29.png' alt='مقياس pH' />
+
+      <h2>جدول مقارنة بين الأحماض والقواعد</h2>
+      <table>
+        <tr><th>الخاصية</th><th>الحمض</th><th>القاعدة</th></tr>
+        <tr><td>الطعم</td><td>حامض</td><td>مر</td></tr>
+        <tr><td>ورقة تباع الشمس</td><td>تحول الأزرق للأحمر</td><td>تحول الأحمر للأزرق</td></tr>
+        <tr><td>التوصيل الكهربائي</td><td>موصل</td><td>موصل</td></tr>
+      </table>
+
+      <h2>فيديو توضيحي</h2>
+      <iframe src='https://www.youtube.com/embed/2pVOSwKv-b8' allowfullscreen></iframe>
+
+      <div class='highlight-box'>
+        <strong>📌 ملخص سريع</strong>
+        <p>الأحماض تتفكك وتعطي H⁺، والقواعد تتفكك وتعطي OH⁻. كلما زاد تركيز H⁺، انخفض pH وزادت الحموضة.</p>
+      </div>
+
+      <p style='margin-top:12px;'>
+        <a href='https://ar.wikipedia.org/wiki/%D8%AD%D9%85%D8%B6' target='_blank' class='btn-outline'>اقرأ المزيد على ويكيبيديا</a>
+      </p>
+    "
+  }
 ]
