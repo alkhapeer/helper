@@ -8,7 +8,6 @@ function renderTrain() {
     <div class="page active" id="page-train">
   `;
 
-  // عرض الأقسام (للثانوي فقط)
   if (categories.length > 0) {
     html += `
       <div class="category-tabs">
@@ -21,7 +20,6 @@ function renderTrain() {
     `;
   }
 
-  // عرض المواد حسب القسم المختار
   let filteredSubjects = subjects;
   if (user.selectedCategory) {
     filteredSubjects = subjects.filter(s => s.category === user.selectedCategory);
@@ -39,7 +37,6 @@ function renderTrain() {
     <div id="lessonsList">
   `;
 
-  // عرض الدروس
   let lessons = getLessonsForStage(user.stage);
   if (user.selectedCategory) {
     const subjectIds = filteredSubjects.map(s => s.id);
@@ -56,7 +53,7 @@ function renderTrain() {
     lessons.forEach(lesson => {
       const isCompleted = completedIds.has(lesson.id);
       const diff = lesson.difficulty === 'easy' ? 'تأسيسي' : lesson.difficulty === 'medium' ? 'متوسط' : 'متقدم';
-      const subjectName = SUBJECTS.find(s => s.id === lesson.subjectId)?.name || '';
+      const subjectName = (SUBJECTS || []).find(s => s.id === lesson.subjectId)?.name || '';
       html += `
         <div class="lesson-item">
           <div class="info">
@@ -64,7 +61,7 @@ function renderTrain() {
             <div class="sub">${diff} • ${subjectName}</div>
           </div>
           <div class="actions">
-            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' : 
+            ${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> مكتمل</span>' :
               `<button class="btn btn-sm" onclick="openLesson('${lesson.id}')">بدء الدراسة</button>`}
           </div>
         </div>
@@ -75,7 +72,6 @@ function renderTrain() {
   html += `</div></div>`;
   container.innerHTML = html;
 
-  // ربط الأحداث
   container.querySelectorAll('.category-tab').forEach(btn => {
     btn.addEventListener('click', function() {
       user.selectedCategory = this.dataset.category;
