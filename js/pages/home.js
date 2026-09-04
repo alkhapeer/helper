@@ -5,11 +5,11 @@ function renderHome() {
   const weak = getWeakTopics(user);
   const plan = user.plan.length ? user.plan : generatePlan(user);
   const today = new Date().getDay();
-  const daysMap = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const daysMap = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   const todayTask = plan.find(p => p.day === daysMap[today]);
   const stageLessons = getLessonsForStage(user.stage);
   const total = stageLessons.length;
-  const completed = user.completedLessons.filter(id => 
+  const completed = user.completedLessons.filter(id =>
     stageLessons.some(l => l.id === id)
   ).length;
 
@@ -40,7 +40,7 @@ function renderHome() {
 
       <div class="card" onclick="navigateTo('plan')" style="cursor:pointer;">
         <div class="card-title"><i class="fas fa-exclamation-circle" style="color:#ff3b30;"></i> أخطاء تحتاج مراجعة</div>
-        <div>${weak.reduce((s,w) => s + (100-w.score)/10, 0).toFixed(0)} سؤالاً</div>
+        <div>${weak.reduce((s, w) => s + (100 - w.score) / 10, 0).toFixed(0)} سؤالاً</div>
       </div>
 
       <div class="card" style="border-right:4px solid #5b7cfa; background:#f8faff;">
