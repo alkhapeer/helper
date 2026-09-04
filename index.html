@@ -55,6 +55,17 @@
       font-size: 18px;
       color: #5b7cfa;
     }
+    /* clickable name */
+    .clickable-name {
+      cursor: pointer;
+      border-bottom: 2px dashed #5b7cfa;
+      transition: 0.2s;
+    }
+    .clickable-name:hover {
+      background: #e0e8ff;
+      border-radius: 6px;
+      padding: 0 4px;
+    }
     /* card */
     .card {
       background: #ffffff;
@@ -249,7 +260,7 @@
 
   <!-- HEADER -->
   <div class="header">
-    <h1>مرحباً، <span id="userName">أحمد</span></h1>
+    <h1>مرحباً، <span id="userName" class="clickable-name" onclick="changeName()">(اضغط لتحديد اسمك)</span></h1>
     <div class="user"><i class="fas fa-user-circle"></i> <span id="userPoints">0</span> نقطة</div>
   </div>
 
@@ -326,7 +337,7 @@
     </div>
   </div>
 
-  <!-- ========== زر إعادة تعيين / تصدير ========== -->
+  <!-- ========== أزرار الإجراءات ========== -->
   <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
     <button class="btn btn-outline" onclick="resetProgress()" style="flex:1;"><i class="fas fa-undo"></i> إعادة تعيين</button>
     <button class="btn" onclick="addSampleData()" style="flex:1;"><i class="fas fa-plus"></i> إضافة بيانات نموذجية</button>
@@ -343,8 +354,6 @@
   // ============================================================
 
   // --- دروس (مقررات) ---
-  // يمكنك إضافة دروس جديدة هنا، أو استيرادها من JSON.
-  // المفتاح: يجب أن يكون id فريداً.
   const LESSONS_DATA = [
     { id: 'math-01', subject: 'الرياضيات', title: 'الدوال', difficulty: 'medium' },
     { id: 'math-02', subject: 'الرياضيات', title: 'التفاضل', difficulty: 'hard' },
@@ -358,7 +367,6 @@
   ];
 
   // --- اختبارات ---
-  // يمكنك إضافة اختبارات جديدة هنا مع تاريخها.
   const TESTS_DATA = [
     { id: 'math-test-01', title: 'اختبار الرياضيات (التفاضل)', date: '2026-09-06', duration: 20 },
     { id: 'arabic-test-01', title: 'اختبار اللغة العربية (النحو)', date: '2026-09-10', duration: 15 },
@@ -367,7 +375,6 @@
   ];
 
   // --- تعريف الإنجازات (القواعد) ---
-  // المفتاح: معرف الإنجاز، value: { name, icon, condition: function(user) }
   const ACHIEVEMENT_DEFS = {
     'first-lesson': {
       name: 'أول درس',
@@ -387,7 +394,7 @@
     'seven-days': {
       name: '🔥 7 أيام متتالية',
       icon: 'fa-fire',
-      condition: (user) => user.streak >= 7   // سنحاكي streak
+      condition: (user) => user.streak >= 7
     },
     'five-lessons': {
       name: '📘 5 دروس مكتملة',
@@ -403,15 +410,14 @@
 
   function getDefaultUser() {
     return {
-      name: 'أحمد',
+      name: '',          // فارغ، سيطلب من المستخدم إدخاله عبر الضغط على الاسم
       goal: 90,
       points: 0,
       completedLessons: [],
-      testResults: [],      // [{testId, score}]
-      achievements: [],     // list of achievement keys
+      testResults: [],
+      achievements: [],
       streak: 0,
       lastActive: null,
-      // يمكن إضافة حقول أخرى حسب الرغبة
     };
   }
 
@@ -420,7 +426,6 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const data = JSON.parse(raw);
-        // دمج مع default للتأكد من وجود كل الخصائص
         const def = getDefaultUser();
         for (let key in def) {
           if (!(key in data)) data[key] = def[key];
@@ -446,15 +451,11 @@
     return { total, completed, progress };
   }
 
-  // نقاط الضعف: بناءً على نتائج الاختبارات
   function getWeakTopics(user) {
-    // نقوم بتجميع الدرجات حسب الموضوع (نستخدم جزء من اسم الاختبار)
     const map = {};
     user.testResults.forEach(tr => {
-      // نبحث عن الاختبار في TESTS_DATA لنأخذ عنوانه
       const testDef = TESTS_DATA.find(t => t.id === tr.testId);
       if (!testDef) return;
-      // نستخرج الموضوع من العنوان (مثلاً "الرياضيات" من "اختبار الرياضيات")
       let subject = 'عام';
       const match = testDef.title.match(/اختبار (.+?)[ \(]/);
       if (match) subject = match[1];
@@ -473,60 +474,43 @@
     return weak;
   }
 
-  // الخطة اليومية: تعتمد على الدروس غير المكتملة + نقاط الضعف + اختبار قادم
   function generateDailyPlan(user) {
     const tasks = [];
     const completedIds = new Set(user.completedLessons);
     const notCompleted = LESSONS_DATA.filter(lesson => !completedIds.has(lesson.id));
 
-    // 1. إذا كان هناك نقاط ضعف، نوصي بدرس من نفس المادة
     const weak = getWeakTopics(user);
     if (weak.length > 0) {
       const weakSub = weak[0].subject;
       const found = notCompleted.find(l => l.subject.includes(weakSub));
       if (found) {
-        tasks.push({ 
-          text: `مراجعة ${found.title} (${found.subject})`, 
-          time: '30 دقيقة',
-          done: false,
-          icon: 'fa-book'
-        });
+        tasks.push({ text: `مراجعة ${found.title} (${found.subject})`, time: '30 دقيقة', done: false, icon: 'fa-book' });
       } else {
-        // إذا لم نجد درساً، نضيف توصية عامة
         tasks.push({ text: `مراجعة ${weakSub}`, time: '30 دقيقة', done: false, icon: 'fa-pen' });
       }
     } else {
-      // إذا لم توجد نقاط ضعف، نأخذ أول درس غير مكتمل
       if (notCompleted.length > 0) {
         const l = notCompleted[0];
         tasks.push({ text: `دراسة ${l.title} (${l.subject})`, time: '45 دقيقة', done: false, icon: 'fa-graduation-cap' });
       }
     }
 
-    // 2. اختبار قادم؟
     const nextTest = getNextTest(user);
     if (nextTest) {
       tasks.push({ text: `مراجعة لـ ${nextTest.title}`, time: '20 دقيقة', done: false, icon: 'fa-clock' });
     }
 
-    // 3. إضافة تدريب إضافي إذا كان هناك وقت
     if (tasks.length < 2) {
       tasks.push({ text: 'حل تمارين عامة', time: '15 دقيقة', done: false, icon: 'fa-puzzle-piece' });
     }
 
-    // تحديد حالة الإنجاز (محاكاة أن بعض المهام قد أنجزت)
-    // في الواقع يمكن ربطها ببيانات المستخدم، لكننا نجعل أول مهمة مكتملة مثلاً
-    if (tasks.length > 0) {
-      // نحدد أول مهمة كـ "منجزة" إذا كان المستخدم لديه دروس مكتملة
-      if (user.completedLessons.length > 0) {
-        tasks[0].done = true;
-      }
+    if (tasks.length > 0 && user.completedLessons.length > 0) {
+      tasks[0].done = true;
     }
 
     return tasks;
   }
 
-  // الاختبار القادم: أقرب اختبار لم يتم حله بعد
   function getNextTest(user) {
     const solvedIds = new Set(user.testResults.map(r => r.testId));
     const now = new Date();
@@ -537,7 +521,6 @@
     return future.length > 0 ? future[0] : null;
   }
 
-  // حساب الإنجازات المفتوحة
   function computeAchievements(user) {
     const unlocked = [];
     for (let key in ACHIEVEMENT_DEFS) {
@@ -546,12 +529,10 @@
         unlocked.push(key);
       }
     }
-    // إضافة ما هو موجود بالفعل
     const all = [...new Set([...user.achievements, ...unlocked])];
     return all;
   }
 
-  // التوصيات الذكية
   function getRecommendations(user) {
     const recs = [];
     const weak = getWeakTopics(user);
@@ -586,11 +567,15 @@
 
   function renderDashboard() {
     const user = loadUser();
-    // تحديث الاسم والنقاط
-    document.getElementById('userName').textContent = user.name || 'أحمد';
+    // تحديث الاسم
+    const nameSpan = document.getElementById('userName');
+    if (user.name && user.name.trim() !== '') {
+      nameSpan.textContent = user.name;
+    } else {
+      nameSpan.textContent = '(اضغط لتحديد اسمك)';
+    }
     document.getElementById('userPoints').textContent = user.points || 0;
 
-    // التقدم
     const stats = getUserStats(user);
     document.getElementById('goalDisplay').textContent = `${user.goal || 90}%`;
     document.getElementById('progressPercent').textContent = `${stats.progress}%`;
@@ -604,7 +589,7 @@
     if (plan.length === 0) {
       planContainer.innerHTML = `<div class="text-muted">لا توجد مهام حالياً</div>`;
     } else {
-      planContainer.innerHTML = plan.map((task, idx) => `
+      planContainer.innerHTML = plan.map((task) => `
         <div class="task-item">
           <div class="left">
             <i class="fas ${task.icon} ${task.done ? 'done' : 'pending'}"></i>
@@ -650,7 +635,6 @@
 
     // الإنجازات
     const allAchievements = computeAchievements(user);
-    // حفظ الإنجازات الجديدة
     if (allAchievements.length > user.achievements.length) {
       user.achievements = allAchievements;
       saveUser(user);
@@ -677,12 +661,37 @@
   }
 
   // ============================================================
-  // 5. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
+  // 5. وظيفة تغيير الاسم (الجزء الجديد المهم)
+  // ============================================================
+  function changeName() {
+    const user = loadUser();
+    const currentName = user.name || '';
+    const newName = prompt('أدخل اسمك ليظهر في لوحة التحكم:', currentName);
+    if (newName !== null) {
+      const trimmed = newName.trim();
+      if (trimmed !== '') {
+        user.name = trimmed;
+        saveUser(user);
+        renderDashboard();
+      } else if (trimmed === '' && currentName !== '') {
+        // إذا أراد المستخدم مسح الاسم
+        user.name = '';
+        saveUser(user);
+        renderDashboard();
+      }
+    }
+  }
+
+  // ============================================================
+  // 6. وظائف مساعدة (إعادة تعيين، إضافة بيانات نموذجية، التنقل)
   // ============================================================
 
   function resetProgress() {
     if (confirm('هل أنت متأكد من حذف كل تقدمك؟')) {
       const def = getDefaultUser();
+      // نحتفظ بالاسم القديم إذا وجد (لطفاً)
+      const oldUser = loadUser();
+      if (oldUser.name) def.name = oldUser.name;
       saveUser(def);
       renderDashboard();
     }
@@ -690,14 +699,12 @@
 
   function addSampleData() {
     const user = loadUser();
-    // إضافة بعض الدروس المكتملة
     const sampleLessons = ['math-01', 'math-03', 'arabic-01', 'physics-02'];
     sampleLessons.forEach(id => {
       if (!user.completedLessons.includes(id)) {
         user.completedLessons.push(id);
       }
     });
-    // إضافة نتائج اختبارات
     const sampleResults = [
       { testId: 'math-test-01', score: 55 },
       { testId: 'arabic-test-01', score: 62 },
@@ -708,40 +715,32 @@
         user.testResults.push(sr);
       }
     });
-    // نقاط
     user.points = Math.max(user.points, 450);
-    // streak
     user.streak = Math.max(user.streak, 3);
     saveUser(user);
     renderDashboard();
     alert('تمت إضافة بيانات نموذجية!');
   }
 
-  // محاكاة التنقل (في تطبيق حقيقي ستنتقل إلى صفحات أخرى)
   function goTo(section) {
     alert(`سيتم الانتقال إلى صفحة: ${section} (يمكنك تنفيذها لاحقاً)`);
   }
 
   // ============================================================
-  // 6. التشغيل الأولي
+  // 7. التشغيل الأولي
   // ============================================================
 
-  // التأكد من وجود مستخدم، وإنشاء افتراضي إذا لم يكن موجوداً
   if (!localStorage.getItem(STORAGE_KEY)) {
     const def = getDefaultUser();
-    // نضيف بعض البيانات الأولية لتجربة أفضل
-    def.name = 'إبراهيم';
-    def.points = 120;
-    def.completedLessons = ['math-01', 'arabic-01'];
-    def.testResults = [{ testId: 'math-test-01', score: 45 }];
-    def.streak = 2;
+    def.name = ''; // فارغ
+    def.points = 0;
+    def.completedLessons = [];
+    def.testResults = [];
+    def.streak = 0;
     saveUser(def);
   }
 
   renderDashboard();
-
-  // يمكن إعادة الرسم كل دقيقة (للتحديث التلقائي)
-  // لكننا نكتفي بالتحديث عند التفاعل.
 </script>
 </body>
 </html>
